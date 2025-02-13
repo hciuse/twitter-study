@@ -6,13 +6,10 @@ library(ggpubr)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
-# This script consists of two parts
-# 1: Bar chart depicting the answer to the 2nd Twitter poll (timing of infection)
-# 2: Comparison the survey respondents' incidence to the official incidence by RKI and incidence according to MuSPAD study
+here()
+source("./R/MuSPADPreprocessing.R")
 
-
-# 1st Part ----------------------------------------------------------------
-
+# Procession of Twitter/Mastodon data
 InfectionTimingTwitter <- data.frame(matrix(nrow = 0, ncol = 4))
 colnames(InfectionTimingTwitter) <- c("TimeFrame", "Share", "OverallNoParticipants", "Recruiter")
 InfectionTimingTwitter[nrow(InfectionTimingTwitter) + 1, ] <- c("Jan - Apr", 0.227, 1131, "Recruiter 1 (Twitter)")
@@ -43,11 +40,11 @@ InfectionTimingTwitter$Share <- as.double(InfectionTimingTwitter$Share)
 InfectionTimingTwitter$OverallNoParticipants <- as.double(InfectionTimingTwitter$OverallNoParticipants)
 InfectionTimingTwitter <- InfectionTimingTwitter %>% mutate(NoVoted = Share * OverallNoParticipants)
 
-#Adding MuSPAD data
-MuSPAD <- MuSPADnewplusold %>% 
-mutate(firstinfection = make_date(MuSPADnewplusold$s22_positive_PCR_year_1, MuSPADnewplusold$s22_positive_PCR_month_1, MuSPADnewplusold$s22_positive_PCR_day_1)) %>%
-mutate(secondinfection = make_date(MuSPADnewplusold$s22_positive_PCR_year_2, MuSPADnewplusold$s22_positive_PCR_month_2, MuSPADnewplusold$s22_positive_PCR_day_2)) %>%
-mutate(thirdinfection = make_date(MuSPADnewplusold$s22_positive_PCR_year_3, MuSPADnewplusold$s22_positive_PCR_month_3, MuSPADnewplusold$s22_positive_PCR_day_3)) %>%
+# Procession of MuSPAD data
+MuSPAD <- MuSPAD_df %>% 
+mutate(firstinfection = make_date(MuSPAD_df$s22_positive_PCR_year_1, MuSPAD_df$s22_positive_PCR_month_1, MuSPAD_df$s22_positive_PCR_day_1)) %>%
+mutate(secondinfection = make_date(MuSPAD_df$s22_positive_PCR_year_2, MuSPAD_df$s22_positive_PCR_month_2, MuSPAD_df$s22_positive_PCR_day_2)) %>%
+mutate(thirdinfection = make_date(MuSPAD_df$s22_positive_PCR_year_3, MuSPAD_df$s22_positive_PCR_month_3, MuSPAD_df$s22_positive_PCR_day_3)) %>%
 select(firstinfection, secondinfection, thirdinfection, w22_positive_PCR_day_1, s23_test_covid_2023)
 
 MuSPADplot <- MuSPAD %>% mutate(test = case_when(abs(as.Date(w22_positive_PCR_day_1) - as.Date(firstinfection)) < 14 ~ NA,
@@ -72,7 +69,7 @@ no_time_infections  <- no_time_infections %>% count(TimeFrame) %>% mutate(Share 
 colnames(no_time_infections)[2] <- "NoVoted"
 InfectionTimingTwitter <- rbind(InfectionTimingTwitter, no_time_infections)
 
-#Adding rki data
+# Procession of RKI data
 rkidata <- read_csv("https://raw.githubusercontent.com/robert-koch-institut/COVID-19_7-Tage-Inzidenz_in_Deutschland/main/COVID-19-Faelle_7-Tage-Inzidenz_Deutschland.csv")
 rkidata <- rkidata %>% 
         filter(Altersgruppe == "00+") %>% 
@@ -128,5 +125,5 @@ guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
         axis.ticks.length = unit(5, "pt")) +
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
-ggsave("TimingOfInfections_Twitter.pdf", dpi = 500, w = 12, h = 7.5)
-ggsave("TimingOfInfections_Twitter.png", dpi = 500, w = 12, h = 7.5)
+#ggsave("TimingOfInfections_Twitter.pdf", dpi = 500, w = 12, h = 7.5)
+#ggsave("TimingOfInfections_Twitter.png", dpi = 500, w = 12, h = 7.5)

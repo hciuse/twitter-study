@@ -8,8 +8,9 @@ library(here)
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
 here()
-source("./AnalysisSP/SecondOrderContactsPaper/DataCleaningPrepForContactAnalysis.R") #Todo: Update once repo has been reorganized
-source("./AnalysisSP/SocialMediaPollsPaper/Timeline.R") #Todo: Update once repo has been reorganized
+ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
+source("./R/Timeline.R")
+source("./R/MuSPADPreprocessing.R")
 
 palette_surveymuspadrki_bars <- function() {
   c("#9900CC", "#93A3b1", "#990000")
@@ -19,19 +20,6 @@ palette_surveymuspadrki_errorbars <- function() {
    c("#640085", "#292e2e", "#5c0000") 
 }
 
-MuSPAD <- read_delim("/Users/sydney/Downloads/Uni_Lübeck/MuSPAD_data_subset.csv") # Enter MuSPAD path
-count_na_w22 <- function(row) {
-  sum(grepl("^w22_", names(row)) & !is.na(row))
-}
-count_na_s22 <- function(row) {
-  sum(grepl("^s22_", names(row)) & !is.na(row))
-}
-count_na_s22w22 <- function(row) {
-  sum(grepl("^w22_", names(row)) & !is.na(row)) + sum(grepl("^s22_", names(row)) & !is.na(row))
-}
-
-MuSPAD_s22 <- readRDS("/Users/sydney/Downloads/9921_dataset/muspad_22-Nov-2022.rds")
-MuSPADnewplusold <- left_join(MuSPAD_s22 %>% mutate(user_id = gsub("_", "-", user_id)) %>% select(user_id), MuSPAD, by = join_by(user_id == merge_id))
 
 # Vaccination Supplier ----------------------------------------------------
 
@@ -88,7 +76,7 @@ vaccinationData <- vaccinationData %>% mutate(vaccineNo = case_when(Impfserie ==
 
 # Procession of MuSPAD data
 
-VaccinationSupplierMuspad <- MuSPADnewplusold %>% select(s23_vacc_type_1, s23_vacc_type_2, s23_vacc_type_3, s23_vacc_type_4)
+VaccinationSupplierMuspad <- MuSPAD_df %>% select(s23_vacc_type_1, s23_vacc_type_2, s23_vacc_type_3, s23_vacc_type_4)
 VaccinationSupplierMuspad1 <- VaccinationSupplierMuspad %>% count(s23_vacc_type_1) %>% filter(!is.na(s23_vacc_type_1)) %>%
                                                             mutate(s23_vacc_type_1 = case_when(s23_vacc_type_1 %in% c("Andere", "Novavax", "Gamaleya Sputnik V") ~ "Other", 
                                                             .default = s23_vacc_type_1))  %>% filter(s23_vacc_type_1 != "keine (weitere) Impfung erhalten")
@@ -251,7 +239,7 @@ RkiVacc$groupsize <- as.double(RkiVacc$groupsize)
 RkiVacc <- RkiVacc %>% mutate(n= groupsize*percent)
 
 # Procession of MuSPAD data
-MuSPADVacc <- MuSPADnewplusold %>% select(c(s22_birth_date_yyyy, s23_vacc_COVID_2019_2023, s23_vacc_type_1, s23_vacc_type_2, s23_vacc_type_3, s23_vacc_type_4))
+MuSPADVacc <- MuSPAD_df %>% select(c(s22_birth_date_yyyy, s23_vacc_COVID_2019_2023, s23_vacc_type_1, s23_vacc_type_2, s23_vacc_type_3, s23_vacc_type_4))
 MuSPADVacc <- MuSPADVacc %>% mutate(s23_vacc_type_1 = case_when(s23_vacc_type_1 %in% c("Moderna", "BioNTech", "AstraZeneca", "Janssen/ Johnson & Johnson", "Novavax") ~ "Yes",
                                                                 s23_vacc_type_1 == NA ~ NA,
                                                                 s23_vacc_type_1 == "keine (weitere) Impfung erhalten" ~ "No")) %>%
