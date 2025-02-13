@@ -8,7 +8,8 @@ library(readxl)
 
 here()
 ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
-source("./R/Timeline.R") #Todo: Update once repo has been reorganized
+source("./R/Timeline.R")
+source("./R/MuSPADPreprocessing.R") #Todo: Update once repo has been reorganized
 
 # Number of infections ----------------------------------------------------
 
@@ -54,7 +55,7 @@ ext_survey_df <- ext_survey_df %>% mutate(num_c19_infs_eng = case_when(num_c19_i
 ext_survey_df$num_c19_infs_eng <- factor(ext_survey_df$num_c19_infs_eng, levels = c("0", "1", "2+"))
 
 # Procession of MuSPAD data
-InfectionsMuspad <- MuSPADnewplusold %>% select(w22_positive_test, s23_test_covid_2023)  %>% 
+InfectionsMuspad <- MuSPAD_df %>% select(w22_positive_test, s23_test_covid_2023)  %>% 
                                   mutate(w22_positive_test = case_when(w22_positive_test == "Nie" ~ "0",
                                                                     w22_positive_test == "Einmal" ~ "1",
                                                                     w22_positive_test == "Zweimal" ~ "2+",

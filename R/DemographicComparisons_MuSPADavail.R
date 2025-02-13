@@ -9,20 +9,7 @@ library(here)
 
 here()
 ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
-
-MuSPAD <- read_delim("/Users/sydney/Downloads/Uni_Lübeck/MuSPAD_data_subset.csv") #Todo: Only works
-count_na_w22 <- function(row) {
-  sum(grepl("^w22_", names(row)) & !is.na(row))
-}
-count_na_s22 <- function(row) {
-  sum(grepl("^s22_", names(row)) & !is.na(row))
-}
-count_na_s22w22 <- function(row) {
-  sum(grepl("^w22_", names(row)) & !is.na(row)) + sum(grepl("^s22_", names(row)) & !is.na(row))
-}
-
-MuSPAD_s22 <- readRDS("/Users/sydney/Downloads/9921_dataset/muspad_22-Nov-2022.rds")
-MuSPADnewplusold <- left_join(MuSPAD_s22 %>% mutate(user_id = gsub("_", "-", user_id)) %>% select(user_id), MuSPAD, by = join_by(user_id == merge_id))
+source("./R/MuspadPreprocessing.R")
 
 #Creation of palette for comparison of external survey, federal office of statistics, and MuSPAD
 palette_surveyfedmuspad_bars <- function() {
