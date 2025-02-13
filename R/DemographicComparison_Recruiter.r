@@ -4,9 +4,8 @@ library(cowplot)
 library(ggpubr)
 library(here)
 
-here() # You need to set the working directory accordingly, otherwise the cleaning script (below does not work)
-source("./AnalysisSP/SecondOrderContactsPaper/DataCleaningPrepForContactAnalysis.R")
-
+here()
+ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
 
 palette_recruiters_bars <- function(){
   c("#253494", "#ffffcc", "#7fcdbb", "#2c7fb8", "#c7e9b4", "#663300", "#151515")
@@ -19,7 +18,7 @@ palette_recruiters_errorbars <- function(){
 # Gender ------------------------------------------------------------------
 
 # Processing of external survey data
-GenderData <- data_reduced %>% select(gender, ref, origin) %>% 
+GenderData <- ext_survey_df %>% select(gender, ref, origin) %>% 
     filter(ref %in% c("dec9d", "6c8d7", "7b598", "008b5", "4a76b")) %>%
     mutate(ref = case_when(ref == "dec9d" & origin == "b73c2" ~ "Recruiter 1 (Twitter)",
                             ref == "4a76b" ~ "Recruiter 2",
@@ -94,7 +93,7 @@ ggplot(aes(gender, percent)) +
 # Age ---------------------------------------------------------------------
 
 # Processing of external survey data
-AgeData <- data_reduced %>% select(year_of_birth, ref, origin) %>% mutate(age = 2023-year_of_birth) %>%
+AgeData <- ext_survey_df %>% select(year_of_birth, ref, origin) %>% mutate(age = 2023-year_of_birth) %>%
             mutate(age_bracket = case_when(age < 20 ~ "18-39",
                                             age < 40 ~ "18-39",
                                             age < 60 ~ "40-59",
@@ -170,7 +169,7 @@ ggplot(aes(factor(age_bracket, levels = c("18-39", "40-59", "60-79", "80-99")), 
 # Household Size ----------------------------------------------------
 
 # Processing of external survey data
-HouseholdData <- data_reduced %>% select(ref, respondent_hsld_size_01_2023, origin) %>%
+HouseholdData <- ext_survey_df %>% select(ref, respondent_hsld_size_01_2023, origin) %>%
                 filter(ref %in% c("dec9d", "6c8d7", "7b598", "008b5", "4a76b")) %>%
                 mutate(ref = case_when(ref == "dec9d" & origin == "b73c2" ~ "Recruiter 1 (Twitter)",
                             ref ==  "6c8d7" ~ "Recruiter 5", 
@@ -237,7 +236,7 @@ HouseholdPlot <- HouseholdData %>% filter(!is.na(ref))  %>% group_by(ref) %>% fi
 # Children under 14 ------------------------------------------------------------------
 
 # Processing of external survey data
-Children <- data_reduced  %>% select(ref, respondent_hsld_size_persons_under_14, origin) %>%
+Children <- ext_survey_df  %>% select(ref, respondent_hsld_size_persons_under_14, origin) %>%
                         filter(ref %in% c("dec9d", "6c8d7", "7b598", "008b5", "4a76b")) %>%
                 mutate(ref = case_when(ref == "dec9d" & origin == "b73c2" ~ "Recruiter 1 (Twitter)",
                         ref ==  "6c8d7" ~ "Recruiter 5", 
@@ -296,7 +295,7 @@ ggplot(aes(respondent_hsld_size_persons_under_14, percent)) +
 # Education / Occupation --------------------------------------------------
 
 # Processing external survey data
-educationLevel <- data_reduced %>% filter(!is.na(ref))  %>% select(highest_educational_qualification, ref, origin) %>%
+educationLevel <- ext_survey_df %>% filter(!is.na(ref))  %>% select(highest_educational_qualification, ref, origin) %>%
                             filter(ref %in% c("dec9d", "6c8d7", "7b598", "008b5", "4a76b")) %>%
                         mutate(ref = case_when(ref == "dec9d" & origin == "b73c2" ~ "Recruiter 1 (Twitter)",
                             ref ==  "6c8d7" ~ "Recruiter 5", 
@@ -371,7 +370,7 @@ ggplot(aes(factor(highest_educational_qualification, levels = c("Higher Educatio
 #Occupation
 
 # Processing external survey data
-currentOccupation <- data_reduced %>% filter(!is.na(ref))  %>% select(ref, current_occupation, origin) %>%
+currentOccupation <- ext_survey_df %>% filter(!is.na(ref))  %>% select(ref, current_occupation, origin) %>%
                             filter(ref %in% c("dec9d", "6c8d7", "7b598", "008b5", "4a76b")) %>%
                         mutate(ref = case_when(ref == "dec9d" & origin == "b73c2" ~ "Recruiter 1 (Twitter)",
                             ref ==  "6c8d7" ~ "Recruiter 5", 
