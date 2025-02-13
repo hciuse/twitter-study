@@ -8,8 +8,8 @@ library(here)
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
 here()
-source("./AnalysisSP/SecondOrderContactsPaper/DataCleaningPrepForContactAnalysis.R") #Todo: Update once repo has been reorganized
-source("./AnalysisSP/SocialMediaPollsPaper/Timeline.R") #Todo: Update once repo has been reorganized
+ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
+source("./R/Timeline.R")
 
 palette_surveyrki_bars <- function() {
   c("#9900CC", "#93A3b1")
@@ -22,7 +22,7 @@ palette_surveyrki_errorbars <- function() {
 # Vaccination Supplier ----------------------------------------------------
 
 # Procession of external survey data
-vaccinationData <- data_reduced %>% select(year_of_birth, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
+vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
 vaccinationData <- na.omit(vaccinationData)
 vaccinationData <- vaccinationData %>% pivot_longer(cols = c("c19_vaccination_details_vaccine_dose_1", "c19_vaccination_details_vaccine_dose_2", "c19_vaccination_details_vaccine_dose_3", "c19_vaccination_details_vaccine_dose_4"))
 vaccinationData$value <- factor(vaccinationData$value, levels=c("BioNTech", "Moderna", "AstraZeneca", "Janssen/ Johnson & Johnson", "Gamaleya Sputnik V", "Andere", "Ich möchte nicht antworten", "Nicht zutreffend"))
@@ -107,7 +107,7 @@ ggplot(aes(value_eng, percent)) +
 # Number of Vaccinations -------------------------------------------------------------
 
 # Procession of external survey data
-vaccinationData <- data_reduced %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
+vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
 vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 80 ~ "80-99",
                                                                     2023-year_of_birth >= 60 ~ "60-79",
                                                                     2023-year_of_birth >= 40 ~ "40-59",
