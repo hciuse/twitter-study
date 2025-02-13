@@ -7,19 +7,18 @@ library(readxl)
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
 here()
-source("./AnalysisSP/SecondOrderContactsPaper/DataCleaningPrepForContactAnalysis.R") #Todo: Update once repo has been reorganized
-source("./AnalysisSP/SocialMediaPollsPaper/Timeline.R") #Todo: Update once repo has been reorganized
-
+ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
+source("./R/Timeline.R")
 
 # Number of infections ----------------------------------------------------
 
-# Creation of palette for comparison of twittwr, mastodon, external survey, MuSPAD, and COSMO
+# Creation of palette for comparison of twittwr, mastodon, external survey, and COSMO
 palette_twittermastodonsurvey_bars <- function() {
-  c("#41b6c4", "#663300", "#9900CC", "#990000", "#CC3300")
+  c("#41b6c4", "#663300", "#9900CC", "#CC3300")
 }
 
 palette_twittermastodonsurvey_errorbars <- function() {
-  c("#2d7e87", "#261300", "#640085", "#5c0000", "#771f01")
+  c("#2d7e87", "#261300", "#640085", "#771f01")
 }
 
 # Procession of Twitter data
@@ -45,36 +44,14 @@ InfectionsDataMastodon$percent <- as.double(InfectionsDataMastodon$percent)
 InfectionsDataMastodon$sum <- as.double(InfectionsDataMastodon$sum)
 
 # Procession of external survey data
-data_reduced <- data_reduced %>% mutate(num_c19_infs_eng = case_when(num_c19_infs == "Nie" ~ "0",
+ext_survey_df <- ext_survey_df %>% mutate(num_c19_infs_eng = case_when(num_c19_infs == "Nie" ~ "0",
                                                                     num_c19_infs == "Einmal" ~ "1",
                                                                     num_c19_infs == "Zweimal" ~ "2+",
                                                                     num_c19_infs == "Dreimal" ~ "2+",
                                                                     num_c19_infs == "Mehr als dreimal" ~ "2+",
                                                                     num_c19_infs == "Ich möchte nicht antworten" ~ "I Don't Want To Answer"))                              
 
-data_reduced$num_c19_infs_eng <- factor(data_reduced$num_c19_infs_eng, levels = c("0", "1", "2+"))
-
-# Procession of MuSPAD data
-InfectionsMuspad <- MuSPADnewplusold %>% select(w22_positive_test, s23_test_covid_2023)  %>% 
-                                  mutate(w22_positive_test = case_when(w22_positive_test == "Nie" ~ "0",
-                                                                    w22_positive_test == "Einmal" ~ "1",
-                                                                    w22_positive_test == "Zweimal" ~ "2+",
-                                                                    w22_positive_test == "Dreimal" ~ "2+",
-                                                                    w22_positive_test == "Mehr als dreimal" ~ "2+")) %>%
-                                  mutate(s23_positive_test = case_when((!is.na(s23_test_covid_2023) &  w22_positive_test == "0") ~ "1",
-                                  (!is.na(s23_test_covid_2023) &  w22_positive_test == "1") ~ "2+",
-                                  .default = w22_positive_test)) %>% 
-                                  count(s23_positive_test)
-InfectionsMuspad <- InfectionsMuspad %>% filter(!is.na(s23_positive_test))
-InfectionsDataMuspad <- data.frame(matrix(nrow = 0, ncol = 5))
-colnames(InfectionsDataMuspad) <- c("num_c19_infs_eng", "n", "percent", "Source", "sum")
-InfectionsDataMuspad[nrow(InfectionsDataMuspad) + 1, ] <- c("0", (InfectionsMuspad %>% filter(s23_positive_test=="0"))$n, 100*(InfectionsMuspad %>% filter(s23_positive_test=="0"))$n/sum(InfectionsMuspad$n), "MuSPAD", sum(InfectionsMuspad$n))
-InfectionsDataMuspad[nrow(InfectionsDataMuspad) + 1, ] <- c("1",	(InfectionsMuspad %>% filter(s23_positive_test=="1"))$n, 100*(InfectionsMuspad %>% filter(s23_positive_test=="1"))$n/sum(InfectionsMuspad$n), "MuSPAD", sum(InfectionsMuspad$n))
-InfectionsDataMuspad[nrow(InfectionsDataMuspad) + 1, ] <- c("2+", (InfectionsMuspad %>% filter(s23_positive_test=="2+"))$n, 100*(InfectionsMuspad %>% filter(s23_positive_test=="2+"))$n/sum(InfectionsMuspad$n), "MuSPAD", sum(InfectionsMuspad$n))
-InfectionsDataMuspad$num_c19_infs_eng <- factor(InfectionsDataMuspad$num_c19_infs_eng, levels = c("0", "1", "2+"))
-InfectionsDataMuspad$n <- as.integer(InfectionsDataMuspad$n)
-InfectionsDataMuspad$percent <- as.double(InfectionsDataMuspad$percent)
-InfectionsDataMuspad$sum <- as.double(InfectionsDataMuspad$sum)
+ext_survey_df$num_c19_infs_eng <- factor(ext_survey_df$num_c19_infs_eng, levels = c("0", "1", "2+"))
  
 # Procession of COSMO data
 # Data comes from https://projekte.uni-erfurt.de/cosmo2020/files/COSMO_W70.pdf [accessed: 2025-02-12]
@@ -90,20 +67,19 @@ InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 
 #Upper panel of Fig. 2
 #Confidence intervals based on: http://www.stat.yale.edu/Courses/1997-98/101/catinf.htm
-upper_panel <- data_reduced %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
+upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
   count(num_c19_infs_eng) %>%
   mutate(percent = 100 * n / sum(n)) %>%
   mutate(Source = "External Survey") %>%
   mutate(sum = sum(n)) %>%
   rbind(InfectionsDataTwitter) %>%
-  rbind(InfectionsDataMuspad) %>%
   rbind(InfectionsDataCOSMO) %>% 
   rbind(InfectionsDataMastodon) %>%
   mutate(lci = (n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
   mutate(lci = 100*lci) %>%
   mutate(uci = (n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
   mutate(uci = 100*uci) %>%
-  mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO"))) %>%
+  mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "COSMO"))) %>%
   ggplot(aes(num_c19_infs_eng, percent, fill=Source)) +
   geom_bar(stat = "identity",  position = "dodge2", width = 0.85) +
   geom_errorbar(aes(x=num_c19_infs_eng, ymin=lci, ymax=uci, colour = Source), position = position_dodge2(padding = 30), width = 0.3, size=2) +
@@ -125,7 +101,7 @@ upper_panel <- data_reduced %>% filter(num_c19_infs_eng != "I Don't Want To Answ
       theme(plot.title = element_text(hjust = 0.5))
 
 
-ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
+ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplotnoMuSPAD, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
 
 ggsave("NoInfections_Comparison.pdf", dpi = 500, w = 24, h = 18)
 ggsave("NoInfections_Comparison.png", dpi = 500, w = 24, h = 18)
