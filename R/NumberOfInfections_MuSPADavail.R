@@ -1,6 +1,5 @@
 library(tidyverse)
 library(RColorBrewer)
-library(cowplot)
 library(ggpubr)
 library(readxl)
 

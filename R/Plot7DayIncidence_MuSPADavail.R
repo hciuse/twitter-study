@@ -1,5 +1,5 @@
-
 library(tidyverse)
+library(here)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
@@ -8,29 +8,32 @@ ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
 source("./R/MuSPADPreprocessing.R")
 source("./R/IncidencePlot.R")
 
-# Incidence Plot without Bootstrapping
+# Incidence Plot without Bootstrapping ----------------------------------------------------
 
-# Data Prep
-    ext_survey_df <- ext_survey_df %>% select(num_c19_infs, date_f1_inf, f1_pcr_doc, f1_pcr_center, date_s2_inf, s2_pcr_doc, s2_pcr_center, date_t3_inf, t3_pcr_doc, t3_pcr_center, year_of_birth) %>% 
+# Processing of external survey data
+ext_survey_df <- ext_survey_df %>% select(num_c19_infs, date_f1_inf, f1_pcr_doc, f1_pcr_center, date_s2_inf, s2_pcr_doc, s2_pcr_center, date_t3_inf, t3_pcr_doc, t3_pcr_center, year_of_birth) %>% 
                 mutate(age = 2023-year_of_birth) %>%
                 mutate(age_bracket = case_when(age < 35 ~ "15-34",
                                                 age < 60 ~ "35-59",
                                                 age < 80 ~ "60-79",
-                                                age < 100 ~ "80+")) 
-        ext_survey_df <- ext_survey_df %>% filter(!is.na(num_c19_infs)) %>%
-        select(-num_c19_infs)
+                                                age < 100 ~ "80+")) %>% 
+                filter(!is.na(num_c19_infs)) %>%
+                select(-num_c19_infs)
     
 # Application of function
-IncidencePlot(bootstrapping = "no")
+IncidencePlot(bootstrapping = "no", MuSPADavail = "yes")
 
-# Incidence Plot with Bootstrapping
+# Incidence Plot with Bootstrapping ----------------------------------------------------
 
+# Creation of age groups
+# Based on https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/Tabellen/bevoelkerung-altersgruppen-deutschland.html
 eighteen_thirtynine <- 31.9
 fourty_fitynine <- 32.2
-sixty_seventynine <- 27.2 + 8.7 #Moved 80+ year olds to 60-79 year olds as there are so few (only 2) that they weirdly influence the sample others
-
+sixty_seventynine <- 27.2 + 8.7 #Moved 80+ year olds to 60-79 year olds as there are so few (only 2) respondents in the external survey in that age group that they weirdly influence the sample others
 age_groups <- c("18-39", "40-59", "60+")
 
+
+#Processing of external survey data
 data <- data.frame(matrix(nrow = 0, ncol = 13))
 colnames(data) <- c("date_f1_inf","f1_pcr_doc","f1_pcr_center","date_s2_inf","s2_pcr_doc","s2_pcr_center","date_t3_inf","t3_pcr_doc","t3_pcr_center","year_of_birth","age","age_bracket", "iteration")
 
@@ -67,11 +70,12 @@ for(i in 1:1000){
 
 ext_survey_df <- data
 
+# Processing of MuSPAD data
 data <- data.frame(matrix(nrow = 0, ncol = ncol(MuSPAD_df)))
 colnames(data) <- colnames(MuSPAD_df)
 
 for(i in 1:1000){
-    for(age_group in age_groups){
+for(age_group in age_groups){
     MuSPAD <- MuSPAD_df %>% 
     mutate(firstinfection = make_date(MuSPAD_df$s22_positive_PCR_year_1, MuSPAD_df$s22_positive_PCR_month_1, MuSPAD_df$s22_positive_PCR_day_1)) %>%
     mutate(secondinfection = make_date(MuSPAD_df$s22_positive_PCR_year_2, MuSPAD_df$s22_positive_PCR_month_2, MuSPAD_df$s22_positive_PCR_day_2)) %>%
@@ -101,5 +105,7 @@ for(i in 1:1000){
     }
 }
 
-MuSPAD <- data 
+MuSPAD_df <- data
 
+# Application of function
+IncidencePlot(bootstrapping = "yes", MuSPADavail = "yes")
