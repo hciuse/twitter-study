@@ -5,7 +5,7 @@ It contains all materials to reproduce our analyses. Anonymized data is availabl
 
 ## Folder structure
 
--   `data/`: Put the preprocessed data from OSF here.
+-   `data/`: Put the preprocessed data from OSF here. If you have access to the MuSPAD data, put the MuSPAD data here, too.
 -   `R`: Contains the analysis of the data.
 -   `Complete Surveys`: Contains the figures.
 
