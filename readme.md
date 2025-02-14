@@ -1,4 +1,5 @@
-This is the repository for the 2024 studies "TITLE Twitter Paper" and "TITLE 2nd order contact paper".
+This is the repository for the 2024 study "Social Media Polls on Twitter and Mastodon:
+Rapid Data Collection for Public Health".
 
 It contains all materials to reproduce our analyses. Anonymized data is available at our OSF repository: https://osf.io/8wvy3/
 
