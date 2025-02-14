@@ -1,6 +1,9 @@
 library(tidyverse)
+library(here)
 
-#Timeline plot including MuSPAD
+# Author: S. Paltra, contact: paltra@tu-berlin.de
+
+# Timeline plot including MuSPAD
 
 tasks <- c("Twitter", "Twitter",
            "Mastodon", "Mastodon",
@@ -60,7 +63,7 @@ timelineplot <- ggplot(dfr %>% filter(source != "RKI")) +
         theme(plot.title = element_text(hjust = 0.5),
         legend.key.width = unit(1.5, 'cm'))
 
-#Timeline plot without MuSPAD
+#Timeline plot excluding MuSPAD
 
 tasks <- c("Twitter", "Twitter",
            "Mastodon", "Mastodon",
@@ -117,7 +120,7 @@ timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
         theme(plot.title = element_text(hjust = 0.5),
         legend.key.width = unit(1.5, 'cm'))
 
-#No Twitter/Mastodon/Cosmo
+#Timeline plot for vaccination figures
 palette_twittermastodonsurvey_bars <- function(){
   c("#9900CC", "#990000", "#9fadaf")
 }
