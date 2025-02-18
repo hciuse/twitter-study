@@ -16,10 +16,10 @@ library(tidyverse)
 ```{r}
 # Read in raw data from the LimeSurvey export (automatically labels data)
 
-source(here("R", "survey_415684_R_syntax_file.R"))
+source(here("R", "00_read_labeled_data.R"))
 
 # Read in csv data, group by user_id and keep rows with highest last_page (people that at least started the survey)
-csv_data <- read.csv(here("raw_data", "twitter_data.csv")) %>% group_by(user_id) %>% filter(last_page != -1, last_page == max(last_page)) %>% ungroup()
+csv_data <- read.csv(here("raw_data", "unlabeled_raw_data.csv")) %>% group_by(user_id) %>% filter(last_page != -1, last_page == max(last_page)) %>% ungroup()
 
 # filter out valid surveys, ip addresses, seeds and refurls
 filtered_data <- data %>% group_by(ID) %>% filter(lastpage != -1, lastpage == max(lastpage)) %>% ungroup() %>% select(-c(id, ipaddr, seed, refurl))
