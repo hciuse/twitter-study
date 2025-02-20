@@ -1,5 +1,4 @@
-This is the repository for the 2024 study "Social Media Polls on Twitter and Mastodon:
-Rapid Data Collection for Public Health".
+This is the repository for the 2024 study "Social Media Polls on Twitter and Mastodon: Rapid Data Collection for Public Health".
 
 It contains all materials to reproduce our analyses. Anonymized data is available at our OSF repository: https://osf.io/8wvy3/
 
@@ -13,8 +12,8 @@ It contains all materials to reproduce our analyses. Anonymized data is availabl
 ## Top level files
 
 -  `Preprocessing.Rmd`: This file contains the code for preprocessing the data.
--  `survey_415684_R_syntax_file.R`: This file contains the automatic labeling of data from the LimeSurvey export
--  `rename.R`: This file contains the code for renaming the variables in the data.
+-  `00_read_labeled_data.R`: This file contains the automatic labeling of data from the LimeSurvey export
+-  `01_rename.R`: This file contains the code for renaming the variables in the data.
 
 If you have access to the MuSPAD data, you may run the following scripts:
 
@@ -43,5 +42,5 @@ This project uses `renv` for reproducibility. You can install the libraries we u
 
 1. Clone the repository.
 2. Call `renv::restore()` from the R terminal.
-3. Create a folder called "data" and put the preprocessed data from OSF there.
+3. Put the preprocessed data from OSF into the folder called "data".
 4. Depending on your access to the MuSPAD data, the according subset of scripts in the `R` folder should run now.

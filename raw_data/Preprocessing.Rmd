@@ -67,7 +67,7 @@ cleaned_data <- filtered_data %>% select(!ends_with("time"), -c(last_page, comme
 filtered_data_lastpage <- filtered_data_lastpage %>% mutate(age = 2023 - year_of_birth, .after = year_of_birth)
 
 # rename all labels
-source(here("R", "rename.R"))
+source(here("R", "01_rename.R"))
 
 # save filtered datasets
 
