@@ -17,14 +17,14 @@ palette_surveymuspadrki_bars <- function() {
 }
 
 palette_surveymuspadrki_errorbars <- function() {
-   c("#640085", "#292e2e", "#5c0000") 
+   c("#430059", "#1c2020", "#390000") 
 }
 
 
 # Vaccination Supplier ----------------------------------------------------
 
 # Procession of external survey data
-vaccinationData <- data_reduced %>% select(year_of_birth, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
+vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
 vaccinationData <- na.omit(vaccinationData)
 vaccinationData <- vaccinationData %>% pivot_longer(cols = c("c19_vaccination_details_vaccine_dose_1", "c19_vaccination_details_vaccine_dose_2", "c19_vaccination_details_vaccine_dose_3", "c19_vaccination_details_vaccine_dose_4"))
 vaccinationData$value <- factor(vaccinationData$value, levels=c("BioNTech", "Moderna", "AstraZeneca", "Janssen/ Johnson & Johnson", "Gamaleya Sputnik V", "Andere", "Ich möchte nicht antworten", "Nicht zutreffend"))
@@ -129,7 +129,7 @@ vaccinationData %>% filter(value_eng != "Does Not Apply") %>% filter(value_eng !
                     mutate(Source = factor(Source, levels = c("External Survey", "RKI", "MuSPAD"))) %>%
 ggplot(aes(value_eng, percent)) +
   geom_bar(aes(fill = Source), stat = "identity", position = "dodge", width = 0.95) +
-  geom_errorbar(aes(x=value_eng, ymin=lci, ymax=uci, colour = Source), position = position_dodge(0.95), width = 0.3, alpha=0.9, size=1.3) +
+  geom_errorbar(aes(x=value_eng, ymin=lci, ymax=uci, colour = Source), position = position_dodge(0.95), width = 0.5, alpha=0.9, size=1.3) +
   theme_minimal() +
   facet_wrap(~vaccineNo, nrow=2) +
   ylab("Share (Percentage)") +
@@ -145,13 +145,13 @@ ggplot(aes(value_eng, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-ggsave("ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
-ggsave("ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
+#ggsave("ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
+#ggsave("ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
 
 # Number of Vaccinations -------------------------------------------------------------
 
 # Procession of external survey data
-vaccinationData <- data_reduced %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
+vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
 vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 80 ~ "80-99",
                                                                     2023-year_of_birth >= 60 ~ "60-79",
                                                                     2023-year_of_birth >= 40 ~ "40-59",
@@ -294,7 +294,7 @@ palette_survey_bars <- function() {
 }
 
 palette_survey_errorbars <- function() {
-  c("#b646db", "#9900CC", "#730099", "#400155")
+  c("#9900CC", "#730099", "#400155", "#260133")
 }
 
 survey_doses <- ggplot(vaccinationData %>%
@@ -307,7 +307,7 @@ filter(name != "Received 0 doses") %>%
                     mutate(uci = case_when(uci > 1 ~ 1, .default= uci)),
 aes(x = name,  y = percent)) +
   geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.3, size=2) +
+  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
@@ -329,7 +329,7 @@ palette_rki_bars <- function() {
 }
 
 palette_rki_errorbars <- function() {
-  c("#6d7b88", "#3e464d")
+  c("#3e464d", "#1f2326")
 }
 
 rki_doses <- ggplot(RkiVacc %>%
@@ -341,7 +341,7 @@ filter(name != "Received 0 doses") %>%
                     mutate(uci = uci/groupsize), 
 aes(x = name,  y = percent)) +
   geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.3, size=2) +
+  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
@@ -362,7 +362,7 @@ palette_muspad_bars <- function() {
 }
 
 palette_muspad_errorbars <- function() {
-  c("#d24747", "#cc0202", "#6d0101", "#350000")
+  c("#cc0202", "#6d0101", "#350000", "#260000")
 }
 
 muspad_doses <- ggplot(MuSPADVacc %>%
@@ -375,7 +375,7 @@ filter(name != "Received 0 doses") %>%
                     mutate(uci = uci/groupsize), 
 aes(x = name,  y = percent)) +
   geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.3, size=2) +
+  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
