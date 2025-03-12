@@ -100,6 +100,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
    
    #Processing of RKI data
     rkidata <- read_csv("https://raw.githubusercontent.com/robert-koch-institut/COVID-19_7-Tage-Inzidenz_in_Deutschland/main/COVID-19-Faelle_7-Tage-Inzidenz_Deutschland.csv")
+    if(Altersgrupe != "00+"){
     rkidata <- rkidata %>% 
             filter(Altersgruppe == age_group) %>% 
             filter(Meldedatum < "2023-08-30") %>%
@@ -108,7 +109,18 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
 
     rkidata <- rkidata %>% select(Meldedatum, `Inzidenz_7-Tage`)
     colnames(rkidata) <- c("Date", "Incidence100000")
-    rkidata <- rkidata %>% mutate(lci = Incidence100000, uci = Incidence100000, DataSet = "RKI")
+    }else if(Altersgruppe == "00+"){
+    rkidata <- rkidata %>% 
+        filter(Altersgruppe %in% c("15-34", "35-59", "60-79", "80+")) %>% 
+        filter(Meldedatum < "2023-08-30") %>%
+        mutate(weekday = wday(Meldedatum)) %>%
+        filter(weekday == 1)
+    rkidata <- rkidata %>% group_by(Meldedatum) %>% summarise(infections = sum(`Faelle_7-Tage`), population = sum(Bevoelkerung))
+    rkidata <- rkidata %>% mutate(Incidence100000 = infections/population*100000)
+    colnames(rkidata)[1] <- "Date"
+    }
+    rkidata <- rkidata %>% mutate(lci = Incidence100000, uci = Incidence100000, DataSet = "RKI") %>% select(Date, Incidence100000, lci, uci, DataSet)
+  
     
     count_no_infections <- count_no_infections %>% 
                             select(Date, Incidence100000, lci, uci) %>%
@@ -270,9 +282,9 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
         xlab("Date") +
         facet_wrap(~DataSet, nrow = 3, strip.position = "bottom") +
         geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-05-14")), color = "#990000", size = 1.5) +
-        annotate("text", x=as.Date("2023-05-14"), y=2100, label="Last infection reported\nto MuSPAD", angle=90, size =10) +
+        annotate("text", x=as.Date("2023-05-14"), y=1900, label="Last infection reported\nto MuSPAD", angle=90, size =10) +
         geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-08-13")), color = "#9900CC", size = 1.5) +
-        annotate("text", x=as.Date("2023-08-13"), y=2100, label="Last infections reported\nto external survey", angle=90, size = 10) +
+        annotate("text", x=as.Date("2023-08-13"), y=1900, label="Last infections reported\nto external survey", angle=90, size = 10) +
         scale_color_manual(values = palette_surveyrki_bars()) +
         scale_fill_manual(values = palette_surveyrki_errorbars()) +
         ggtitle("7-Day-Incidence per 100,000") +
@@ -297,3 +309,5 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
   }
 
 }
+
+IncidencePlot()
