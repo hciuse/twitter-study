@@ -100,7 +100,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
    
    #Processing of RKI data
     rkidata <- read_csv("https://raw.githubusercontent.com/robert-koch-institut/COVID-19_7-Tage-Inzidenz_in_Deutschland/main/COVID-19-Faelle_7-Tage-Inzidenz_Deutschland.csv")
-    if(Altersgrupe != "00+"){
+    if(age_group != "00+"){
     rkidata <- rkidata %>% 
             filter(Altersgruppe == age_group) %>% 
             filter(Meldedatum < "2023-08-30") %>%
@@ -109,7 +109,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
 
     rkidata <- rkidata %>% select(Meldedatum, `Inzidenz_7-Tage`)
     colnames(rkidata) <- c("Date", "Incidence100000")
-    }else if(Altersgruppe == "00+"){
+    }else if(age_group == "00+"){
     rkidata <- rkidata %>% 
         filter(Altersgruppe %in% c("15-34", "35-59", "60-79", "80+")) %>% 
         filter(Meldedatum < "2023-08-30") %>%
@@ -294,18 +294,17 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
         #ggtitle(age_group) +
         theme(text = element_text(size = 55)) +
         scale_y_continuous(breaks = c (0,500,1000,1500,2000,2500), limits=c(0,2750)) +
-        scale_x_date(date_breaks = "6 months", date_labels = "%Y/%m")+
-        scale_x_date(breaks= seq(min(count_no_infections$Date), as.Date("2023-08-31"), by = "6 months"), date_labels =  )+
         theme(legend.position = "none", legend.title = element_blank()) +
           theme(axis.ticks.x = element_line(),
             axis.ticks.y = element_line(),
             axis.ticks.length = unit(12, "pt")) +
+        scale_x_date(breaks= seq(min(count_no_infections$Date), as.Date("2023-08-31"), by = "6 months"), date_labels = "%Y/%m")
         theme(plot.title = element_text(hjust = 0.5)) 
 
-    ggarrange(ComSurveyRki, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, labels = c("A", "", "B"), nrow = 3, ncol = 1,  align = "v", font.label = list(size = 37), heights = c(1.1,0.05,0.22))
+    ggarrange(ComSurveyRki, timelineplot2, labels = c("A", "B"), nrow = 2, ncol = 1,  align = "hv", font.label = list(size = 37), heights = c(1.1,0.22))
     
-    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".pdf"), dpi = 500, w = 24, h = 30)
-    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".png"), dpi = 500, w = 24, h = 30)
+    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".pdf"), dpi = 500, w = 25, h = 30)
+    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".png"), dpi = 500, w = 25, h = 30)
   }
 
 }

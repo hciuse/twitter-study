@@ -19,12 +19,12 @@ dfr <- data.frame(
                 "External Survey",
                 "Mastodon",
                 "Twitter")),
-  start.date = as.Date(c("2023-07-19", "2020-03-01", 
-                         "2023-07-19", "2020-03-01",
-                         "2023-07-18", "2020-12-27",
-                        "2020-12-27", 
-                         "2022-05-01", "2022-12-01", "2023-04-01", "2020-12-27",
-                         "2022-11-26", "2020-03-01")),
+  start.date = as.Date(c("2023-07-19", "2020-01-01", 
+                         "2023-07-19", "2020-01-01",
+                         "2023-07-18", "2020-01-01",
+                        "2020-01-01", 
+                         "2022-05-01", "2022-12-01", "2023-04-01", "2020-01-01",
+                         "2022-11-26", "2020-01-01")),
                          
   end.date = as.Date(c("2023-07-26", "2023-07-26",
                       "2023-07-26", "2023-07-26",
@@ -132,7 +132,6 @@ timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External Survey", "RKI", "
                          colour = source,
                          linetype = type),
                          linewidth = c(5, 2, 5, 5, 5, 5, 2)) +
-      scale_x_date(breaks= seq(as.Date("2020-01-01"), as.Date("2023-09-30"), by = "6 months"), date_labels = "%Y/%m")+
       theme_minimal() +
       scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
       ylab("") +
@@ -144,7 +143,8 @@ timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External Survey", "RKI", "
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
         theme(plot.title = element_text(hjust = 0.5),
-        legend.key.width = unit(1.5, 'cm'))
+        legend.key.width = unit(1.5, 'cm')) +
+      scale_x_date(breaks= seq(as.Date("2020-01-01"), as.Date("2023-08-31"), by = "6 months"), date_labels = "%Y/%m", expand = expansion(mult = c(0, 0.05)))
 
 
 
