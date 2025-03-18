@@ -36,11 +36,19 @@ If you do _not_ have access to the MuSPAD data, you may run the following script
 - `TimingOfInfection_MuSPADunavail.R`: This file contains code to produce Figure S1 (minus the MuSPAD data).
 - `DemographicComparison_Recruiter.R`: This file contains code to produce Figure S2 and S3.
 
-## Instructions for reproducibility
+### Instructions to reproduce the plots
 
-This project uses `renv` for reproducibility. You can install the libraries we used by calling `renv::restore()` from the R terminal.
+This project uses `renv` for reproducibility.
+To reproduce the plots found in the paper, follow these steps:
 
-1. Clone the repository.
-2. Call `renv::restore()` from the R terminal.
-3. Put the preprocessed data from OSF into the folder called "data".
-4. Depending on your access to the MuSPAD data, the according subset of scripts in the `R` folder should run now.
+1. Clone the repository
+2. Call `renv::restore()` from the R terminal
+3. Put the preprocessed data from OSF into the folder called "data"
+    * The cleaned data set called `cleaned_data.rds`
+    * The XLSX file called `employment-germany-by-occupation-2023.xlsx`
+    * If you have access to the MuSPAD data, put the `muspad_22-Nov-2022.rds` and `MuSPAD_data_subset.csv` files in the data folder
+4. Now you can run the scripts in the `R` folder to reproduce the plots
+5. The resulting plots can be found in the `plots` folder. Each scripts generates a PDF and PNG version of the plot
+
+
+
