@@ -95,5 +95,5 @@ guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
         axis.ticks.length = unit(5, "pt")) +
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
-#ggsave("TimingOfInfections_Twitter.pdf", dpi = 500, w = 12, h = 7.5)
-#ggsave("TimingOfInfections_Twitter.png", dpi = 500, w = 12, h = 7.5)
+ggsave("./plots/TimingOfInfections_Twitter_without_Muspad.pdf", dpi = 500, w = 12, h = 7.5)
+ggsave("./plots/TimingOfInfections_Twitter_without_Muspad.png", dpi = 500, w = 12, h = 7.5)
