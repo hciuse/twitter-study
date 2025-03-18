@@ -81,8 +81,8 @@ ggplot(aes(gender, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("Gender_Comparison.pdf", GenderPlot, dpi = 500, w = 9.5, h = 6)
-#ggsave("Gender_Comparison.png", GenderPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Gender_Comparison.pdf", GenderPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Gender_Comparison.png", GenderPlot, dpi = 500, w = 9.5, h = 6)
 
 # Age ---------------------------------------------------------------------
 
@@ -155,8 +155,8 @@ ggplot(aes(age_bracket, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("Age_Comparison.pdf", dpi = 500, w = 9.5, h = 6)
-#ggsave("Age_Comparison.png", dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Age_Comparison.pdf", dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Age_Comparison.png", dpi = 500, w = 9.5, h = 6)
 
 # Household Size ----------------------------------------------------
 
@@ -267,8 +267,8 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("HouseholdSize.png", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
-#ggsave("HouseholdSize.pdf", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/HouseholdSize.png", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/HouseholdSize.pdf", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
 
 # Children under 14 ------------------------------------------------------------------
 
@@ -341,8 +341,8 @@ ggplot(aes(total_hsld_size_persons_under_14, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("Children_Comparison.png", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
-#ggsave("Children_Comparison.pdf", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Children_Comparison.png", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
+#ggsave("./plots/Children_Comparison.pdf", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
 
 
 # Education --------------------------------------------------
@@ -425,8 +425,8 @@ ggplot(aes(highest_educational_qualification, percent)) +
         axis.ticks.length = unit(5, "pt")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7))
 
-#ggsave("EducationLevel_Comparison.pdf", EducationPlot, dpi = 500, w =9.5, h = 9)
-#ggsave("EducationLevel_Comparison.png", EducationPlot, dpi = 500, w =9.5, h = 9)
+#ggsave("./plots/EducationLevel_Comparison.pdf", EducationPlot, dpi = 500, w =9.5, h = 9)
+#ggsave("./plots/EducationLevel_Comparison.png", EducationPlot, dpi = 500, w =9.5, h = 9)
 
 # Occupation --------------------------------------------------
 
@@ -474,7 +474,7 @@ OccupationDataMuspad$percent <- as.double(OccupationDataMuspad$percent)
 
 # Processing of federal statistical office data
 #Data stems from https://de.statista.com/statistik/daten/studie/1099494/umfrage/beschaeftigte-in-deutschland-nach-berufsgruppen/ [accessed: 2025-02-10]
-FedEmploymentAgency <- read_xlsx("/Users/sydney/Downloads/statistic_id1099494_beschaeftigte-in-deutschland-nach-berufsgruppen-2023.xlsx", sheet = 2)
+FedEmploymentAgency <- read_xlsx("./data/employment-germany-by-occupation-2023.xlsx", sheet = 2)
 colnames(FedEmploymentAgency) <- c("occupation", "n")
 OccupationDataFedEmploymentAgency <- data.frame(matrix(nrow = 0, ncol = 3))
 other <- c("Berufe in Unternehmensführung, -organisation (Büro)", "Verkaufsberufe", "Verkehr, Logistik (außer Fahrzeugführung)", "Erziehung, soz., hauswirt. Berufe, Theologie", 
@@ -526,10 +526,10 @@ ggplot(aes(current_occupation, percent)) +
         axis.ticks.length = unit(5, "pt")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7))
 
-#ggsave("Occupation_Comparison.pdf", OccupationPlot, dpi = 500, w =9.5, h = 9)
-#ggsave("Occupation_Comparison.png", OccupationPlot, dpi = 500, w =9.5, h = 9)
+#ggsave("./plots/Occupation_Comparison.pdf", OccupationPlot, dpi = 500, w =9.5, h = 9)
+#ggsave("./plots/Occupation_Comparison.png", OccupationPlot, dpi = 500, w =9.5, h = 9)
 
 # Layout and save plots
 ggarrange(GenderPlot, AgePlot, HouseholdPlot, ChildrenPlot, EducationPlot, OccupationPlot, labels = c("A", "B", "C", "D", "E", "F"), nrow = 3, ncol = 2,font.label = list(size = 37), heights = c(1,1,1.25), common.legend = TRUE, legend = "bottom")
-ggsave("DemographicComparison.pdf", dpi = 500, w = 24, h = 30)
-ggsave("DemographicComparison.png", dpi = 500, w = 24, h = 30)
+ggsave("./plots/DemographicComparison.pdf", dpi = 500, w = 24, h = 30)
+ggsave("./plots/DemographicComparison.png", dpi = 500, w = 24, h = 30)
