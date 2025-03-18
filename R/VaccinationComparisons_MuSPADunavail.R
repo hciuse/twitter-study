@@ -101,8 +101,8 @@ ggplot(aes(value_eng, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
-#ggsave("ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
+#ggsave("./plots/ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
+#ggsave("./plots/ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
 
 # Number of Vaccinations -------------------------------------------------------------
 
@@ -266,5 +266,5 @@ aes(x = name,  y = percent)) +
 # Layout and save plots
 ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))
 
-ggsave("NoVaccinations_Comparison.pdf", dpi = 500, w = 24, h = 36)
-ggsave("NoVaccinations_Comparison.png", dpi = 500, w = 24, h = 36)
+ggsave("./plots/NoVaccinations_Comparison.pdf", dpi = 500, w = 24, h = 36)
+ggsave("./plots/NoVaccinations_Comparison.png", dpi = 500, w = 24, h = 36)
