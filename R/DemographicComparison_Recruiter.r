@@ -411,7 +411,7 @@ OccupationAdd$percent <- as.double(OccupationAdd$percent)
 
 # Processing federal statistical office data
 # Data stems from https://de.statista.com/statistik/daten/studie/1099494/umfrage/beschaeftigte-in-deutschland-nach-berufsgruppen/ [accessed 2025-02-11]
-FedEmploymentAgency <- read_xlsx("/Users/sydney/Downloads/statistic_id1099494_beschaeftigte-in-deutschland-nach-berufsgruppen-2023.xlsx", sheet = 2)
+FedEmploymentAgency <- read_xlsx("./data/employment-germany-by-occupation-2023.xlsx", sheet = 2)
 colnames(FedEmploymentAgency) <- c("occupation", "n")
 OccupationDataFedEmploymentAgency <- data.frame(matrix(nrow = 0, ncol = 3))
 other <- c("Berufe in Unternehmensführung, -organisation (Büro)", "Verkaufsberufe", "Verkehr, Logistik (außer Fahrzeugführung)", "Erziehung, soz., hauswirt. Berufe, Theologie", 
@@ -470,13 +470,13 @@ ggplot(aes(current_occupation, percent)) +
 
 ggarrange(GenderPlot, AgePlot, HouseholdPlot, labels = c("A", "B", "C"), nrow = 3, ncol = 1, font.label = list(size = 37), common.legend = TRUE, legend = "bottom")
 
-ggsave("DemographicComparison_TwitterRecruiter_FirstFour.pdf", dpi = 500, w = 24, h = 37)
-ggsave("DemographicComparison_TwitterRecruiter_FirstFour.png", dpi = 500, w = 24, h = 37)
+ggsave("./plots/DemographicComparison_TwitterRecruiter_FirstFour.pdf", dpi = 500, w = 24, h = 37)
+ggsave("./plots/DemographicComparison_TwitterRecruiter_FirstFour.png", dpi = 500, w = 24, h = 37)
 
 ggarrange(EducationPlot, OccupationPlot, ChildrenPlot, labels = c("A", "B", "C"), nrow = 3, ncol = 1, font.label = list(size = 37), common.legend = TRUE, legend = "bottom", heights = c(1,1,0.75))
 
-ggsave("DemographicComparison_TwitterRecruiter_FinalTwo.pdf", dpi = 500, w = 24, h = 37)
-ggsave("DemographicComparison_TwitterRecruiter_FinalTwo.png", dpi = 500, w = 24, h = 37)
+ggsave("./plots/DemographicComparison_TwitterRecruiter_FinalTwo.pdf", dpi = 500, w = 24, h = 37)
+ggsave("./plots/DemographicComparison_TwitterRecruiter_FinalTwo.png", dpi = 500, w = 24, h = 37)
 
 
 
