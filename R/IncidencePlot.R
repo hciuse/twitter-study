@@ -7,6 +7,11 @@ library(ggpubr)
 
 here()
 ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
+ext_survey_df <-  ext_survey_df %>% mutate(age = 2023-year_of_birth) %>%
+  mutate(age_bracket = case_when(age < 35 ~ "15-34",
+                                 age < 60 ~ "35-59",
+                                 age < 80 ~ "60-79",
+                                 age < 100 ~ "80+"))
 source("./R/MuSPADPreprocessing.R")
 source("./R/timeline.R")
 
@@ -303,8 +308,8 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
 
     ggarrange(ComSurveyRki, timelineplot2, labels = c("A", "B"), nrow = 2, ncol = 1,  align = "hv", font.label = list(size = 37), heights = c(1.1,0.22))
     
-    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".pdf"), dpi = 500, w = 25, h = 30)
-    ggsave(paste0("VizComparisonIncidenceSurveyRKI", age_group, "bootstrap", bootstrapping, ".png"), dpi = 500, w = 25, h = 30)
+    ggsave(paste0("./plots/VizComparisonIncidenceSurveyRKI_", age_group, "_bootstrapped_", bootstrapping, ".pdf"), dpi = 500, w = 25, h = 30)
+    ggsave(paste0("./plots/VizComparisonIncidenceSurveyRKI_", age_group, "_bootstrapped_ ", bootstrapping, ".png"), dpi = 500, w = 25, h = 30)
   }
 
 }
