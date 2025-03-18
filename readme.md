@@ -1,6 +1,6 @@
-This is the repository for the 2024 study "Social Media Polls on Twitter and Mastodon: Rapid Data Collection for Public Health".
+This is the repository for the 2025 study "Social Media Polls on Twitter and Mastodon: Rapid Data Collection for Public Health".
 
-It contains all materials to reproduce our analyses. Anonymized data is available at our OSF repository: https://osf.io/8wvy3/
+It contains all materials to reproduce our analyses. Anonymized data is available at our OSF repository: https://osf.io/7vzgd/files/osfstorage
 
 ## Folder structure
 
