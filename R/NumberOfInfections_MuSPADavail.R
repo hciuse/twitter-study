@@ -126,8 +126,8 @@ upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Ans
 
 ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
 
-ggsave("NoInfections_Comparison.pdf", dpi = 500, w = 24, h = 18)
-ggsave("NoInfections_Comparison.png", dpi = 500, w = 24, h = 18)
+ggsave("./plots/NoInfections_Comparison.pdf", dpi = 500, w = 24, h = 18)
+ggsave("./plots/NoInfections_Comparison.png", dpi = 500, w = 24, h = 18)
 
 # Number of infections (by recruiter) ----------------------------------------------------
 
@@ -204,5 +204,5 @@ InfectionsDataTwitter %>% group_by(recruiter) %>%
         axis.ticks.length = unit(5, "pt")) +
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
-ggsave("NoInfections_Comparison_Recruiter.pdf", dpi = 500, w = 10, h = 7.5)
-ggsave("NoInfections_Comparison_Recruiter.png", dpi = 500,  w = 10, h = 7.5)
+ggsave("./plots/NoInfections_Comparison_Recruiter.pdf", dpi = 500, w = 10, h = 7.5)
+ggsave("./plots/NoInfections_Comparison_Recruiter.png", dpi = 500,  w = 10, h = 7.5)
