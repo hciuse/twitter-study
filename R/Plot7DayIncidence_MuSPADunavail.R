@@ -40,7 +40,7 @@ colnames(data) <- c("date_f1_inf","f1_pcr_doc","f1_pcr_center","date_s2_inf","s2
 for(i in 1:1000){
     for(age_group in age_groups){
 
-        raw_data <- readRDS(file = "/Users/sydney/Desktop/cleaned_data.rds")
+        raw_data <- readRDS(file = "./data/cleaned_data.rds")
         ext_survey_df <- raw_data %>% select(num_c19_infs, date_f1_inf, f1_pcr_doc, f1_pcr_center, date_s2_inf, s2_pcr_doc, s2_pcr_center, date_t3_inf, t3_pcr_doc, t3_pcr_center, year_of_birth) %>% 
                     mutate(age = 2023-year_of_birth) %>%
                     mutate(age_bracket = case_when(age < 39 ~ "18-39",
