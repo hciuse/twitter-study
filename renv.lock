@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.2",
+    "Version": "4.4.3",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -1909,6 +1909,21 @@
         "utils"
       ],
       "Hash": "f8b2924480a2679e2bad9750646112fe"
+    },
+    "table1": {
+      "Package": "table1",
+      "Version": "1.4.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Formula",
+        "R",
+        "htmltools",
+        "knitr",
+        "stats",
+        "yaml"
+      ],
+      "Hash": "9fddc683a5738d9493d7c3619ea8fc96"
     },
     "textshaping": {
       "Package": "textshaping",
