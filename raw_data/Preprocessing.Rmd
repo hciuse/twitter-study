@@ -25,10 +25,10 @@ csv_data <- read.csv(here("raw_data", "unlabeled_raw_data.csv")) %>% group_by(us
 filtered_data <- data %>% group_by(ID) %>% filter(lastpage != -1, lastpage == max(lastpage)) %>% ungroup() %>% select(-c(id, ipaddr, seed, refurl))
 
 # filter out unnecessary columns
-filtered_data <- filtered_data %>% select(-c(submitdate, startlanguage, startdate, datestamp, AC, ref, origin, ID))
+filtered_data <- filtered_data %>% select(-c(submitdate, startlanguage, startdate, datestamp, AC, ID))
 
 # filter out unnecessary columns
-csv_data <- csv_data %>% select(-c(user_id, submit_date, start_language, start_date, datestamp, is_adult, ref, origin))
+csv_data <- csv_data %>% select(-c(user_id, submit_date, start_language, start_date, datestamp, is_adult))
 
 # transfer names from csv_data to filtered data
 names(filtered_data) <- names(csv_data)

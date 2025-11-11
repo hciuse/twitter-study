@@ -145,8 +145,8 @@ ggplot(aes(value_eng, percent)) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"))
 
-#ggsave("./plots/ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
-#ggsave("./plots/ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
+ggsave("./plots/ShareVaccinationSupplier.pdf", dpi = 500, w = 24, h = 18)
+ggsave("./plots/ShareVaccinationSupplier.png", dpi = 500, w = 24, h = 18)
 
 # Number of Vaccinations -------------------------------------------------------------
 
@@ -266,14 +266,14 @@ MuSPADVacc <- MuSPADVacc %>% pivot_longer(cols = c(s23_vacc_type_1, s23_vacc_typ
                               name == "s23_vacc_type_2" ~ "Received at\nleast 2 doses",
                               name == "s23_vacc_type_3" ~ "Received at\nleast 3 doses",
                               name == "s23_vacc_type_4" ~ "Received at\nleast 4 doses")) %>%
-                              mutate(Source = "MuSPAD\n(data acquisition:\nYY/MM/DD-YY/MM/DD)")
+                              mutate(Source = "MuSPAD")
 
 NotVacc <- data.frame(matrix(nrow = 0, ncol = 4))
 colnames(NotVacc) <- c("name", "n", "Source", "agegroup")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 30, "MuSPAD\n(data acquisition:\nYY/MM/DD-YY/MM/DD)", "18-39")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 80, "MuSPAD\n(data acquisition:\nYY/MM/DD-YY/MM/DD)", "40-59")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 68 , "MuSPAD\n(data acquisition:\nYY/MM/DD-YY/MM/DD)", "60-79")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD\n(data acquisition:\nYY/MM/DD-YY/MM/DD)", "80-99") ##Use c19_vaccination_status to find unvaccinated
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 30, "MuSPAD", "18-39")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 80, "MuSPAD", "40-59")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 68 , "MuSPAD", "60-79")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD", "80-99") ##Use c19_vaccination_status to find unvaccinated
 NotVacc$n <- as.double(NotVacc$n)                                                              
 
 MuSPADVacc <- rbind(MuSPADVacc, NotVacc)
