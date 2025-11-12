@@ -59,66 +59,65 @@ model_two_plus <- glmer(is_two_plus ~ 1 + (1|recruiter),
                         data = individual_data, 
                         family = binomial)
 
-# Function to get predictions with uncertainty from mixed model
-get_predictions <- function(model, data) {
-  # Get predictions on probability scale
-  pred <- predict(model, newdata = data, type = "response", re.form = ~(1|recruiter))
-  
-  # Bootstrap confidence intervals
-  boot_fun <- function(model) {
-    predict(model, newdata = data, type = "response", re.form = ~(1|recruiter))
+# Calculate raw observed proportions for bar heights
+observed_props <- individual_data %>%
+  group_by(recruiter, num_c19_infs_eng) %>%
+  summarise(
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(recruiter) %>%
+  mutate(
+    total = sum(n),
+    percent = (n / total) * 100
+  ) %>%
+  ungroup()
+
+# Function to get confidence intervals from mixed model using bootstrap
+get_ci_from_model <- function(model, data, outcome_var) {
+  # Create prediction function for bootstrap
+  boot_fun <- function(.) {
+    predict(., newdata = data, type = "response", re.form = ~(1|recruiter))
   }
   
-  # Use parametric bootstrap
+  # Parametric bootstrap
   boot_results <- bootMer(model, boot_fun, nsim = 500, seed = 123)
   
   # Calculate confidence intervals
   ci <- apply(boot_results$t, 2, quantile, probs = c(0.025, 0.975))
   
-  return(list(
-    fit = pred,
-    lci = ci[1, ],
-    uci = ci[2, ]
+  return(data.frame(
+    recruiter = data$recruiter,
+    lci = ci[1, ] * 100,
+    uci = ci[2, ] * 100
   ))
 }
 
-# Create prediction data frame
+# Create prediction data frame (one row per recruiter)
 pred_data <- data.frame(
   recruiter = unique(individual_data$recruiter)
 )
 
-# Get predictions for each category
-pred_zero <- get_predictions(model_zero, pred_data)
-pred_one <- get_predictions(model_one, pred_data)
-pred_two_plus <- get_predictions(model_two_plus, pred_data)
+# Get CIs for each category
+ci_zero <- get_ci_from_model(model_zero, pred_data, "is_zero")
+ci_one <- get_ci_from_model(model_one, pred_data, "is_one")
+ci_two_plus <- get_ci_from_model(model_two_plus, pred_data, "is_two_plus")
 
-# Combine predictions into plotting format
-plot_data <- bind_rows(
-  data.frame(
-    recruiter = pred_data$recruiter,
-    num_c19_infs_eng = "0",
-    percent = pred_zero$fit * 100,
-    lci = pred_zero$lci * 100,
-    uci = pred_zero$uci * 100
-  ),
-  data.frame(
-    recruiter = pred_data$recruiter,
-    num_c19_infs_eng = "1",
-    percent = pred_one$fit * 100,
-    lci = pred_one$lci * 100,
-    uci = pred_one$uci * 100
-  ),
-  data.frame(
-    recruiter = pred_data$recruiter,
-    num_c19_infs_eng = "2+",
-    percent = pred_two_plus$fit * 100,
-    lci = pred_two_plus$lci * 100,
-    uci = pred_two_plus$uci * 100
-  )
-) %>%
+# Add infection category labels
+ci_zero$num_c19_infs_eng <- "0"
+ci_one$num_c19_infs_eng <- "1"
+ci_two_plus$num_c19_infs_eng <- "2+"
+
+# Combine all CIs
+all_ci <- bind_rows(ci_zero, ci_one, ci_two_plus) %>%
   mutate(num_c19_infs_eng = factor(num_c19_infs_eng, levels = c("0", "1", "2+")))
 
-# Create plot with mixed model uncertainty bands
+# Merge observed proportions with model-based CIs
+plot_data <- observed_props %>%
+  select(recruiter, num_c19_infs_eng, percent) %>%
+  left_join(all_ci, by = c("recruiter", "num_c19_infs_eng"))
+
+# Create plot
 plot_data %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(aes(fill = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", 
@@ -144,8 +143,10 @@ plot_data %>%
         axis.ticks.length = unit(5, "pt")) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5)
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 10, h = 7.5)
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel_RawProps.pdf"), 
+       dpi = 500, w = 10, h = 7.5)
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel_RawProps.png"), 
+       dpi = 500, w = 10, h = 7.5)
 
 # Print model summaries
 cat("\n=== Model Summary for '0 infections' ===\n")

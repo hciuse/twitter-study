@@ -72,11 +72,11 @@ flow_diagram %>%
   rsvg_png(here("plots", "participant_flow_diagram.png"), width = 1200)
 
 # Specify the variables of interest
-vars <- c("gender", "year_of_birth", "num_c19_infs", "c19_vaccination_status")
+vars <- c("gender", "year_of_birth", "num_c19_infs", "date_f1_inf", "date_s2_inf", "date_t3_inf", "c19_vaccination_status")
 
 # Calculate percentage of missing values for each variable
 missing_report <- sapply(vars, function(v) {
-  mean(is.na(cleaned_data[[v]])) * 100
+  mean(is.na(data[[v]])) * 100
 })
 
 # Convert to a neat data frame for better readability
