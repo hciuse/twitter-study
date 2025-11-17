@@ -71,19 +71,50 @@ flow_diagram %>%
   charToRaw() %>%
   rsvg_png(here("plots", "participant_flow_diagram.png"), width = 1200)
 
-# Specify the variables of interest
-vars <- c("gender", "year_of_birth", "num_c19_infs", "date_f1_inf", "date_s2_inf", "date_t3_inf", "c19_vaccination_status")
+# Map factor levels to numeric counts
+data$num_c19_infs_num <- NA  # create new numeric column
 
-# Calculate percentage of missing values for each variable
-missing_report <- sapply(vars, function(v) {
-  mean(is.na(data[[v]])) * 100
-})
+data$num_c19_infs_num[data$num_c19_infs == "Nie"] <- 0
+data$num_c19_infs_num[data$num_c19_infs == "Einmal"] <- 1
+data$num_c19_infs_num[data$num_c19_infs == "Zweimal"] <- 2
+data$num_c19_infs_num[data$num_c19_infs == "Dreimal"] <- 3
+data$num_c19_infs_num[data$num_c19_infs == "Mehr als dreimal"] <- 4
+data$num_c19_infs_num[data$num_c19_infs == "Ich möchte nicht antworten"] <- NA
 
-# Convert to a neat data frame for better readability
-missing_report <- data.frame(
-  variable = vars,
-  missing_percent = round(missing_report, 2)
-)
+# Variables of interest
+vars <- c("gender", "year_of_birth", "num_c19_infs", 
+          "date_f1_inf", "date_s2_inf", "date_t3_inf", 
+          "c19_vaccination_status")
 
-# Print the report
+# Function to calculate missing percentages
+calc_missing <- function(data) {
+  
+  missing_percent <- sapply(vars, function(v) {
+    
+    if (v == "date_f1_inf") {
+      subset <- data[data$num_c19_infs_num == 1, ]
+      mean(is.na(subset[[v]])) * 100
+      
+    } else if (v == "date_s2_inf") {
+      subset <- data[data$num_c19_infs_num == 2, ]
+      mean(is.na(subset[[v]])) * 100
+      
+    } else if (v == "date_t3_inf") {
+      subset <- data[data$num_c19_infs_num >= 3, ]
+      mean(is.na(subset[[v]])) * 100
+      
+    } else {
+      mean(is.na(data[[v]])) * 100
+    }
+    
+  })
+  
+  data.frame(
+    variable = vars,
+    missing_percent = round(missing_percent, 2)
+  )
+}
+
+# Generate missing data report
+missing_report <- calc_missing(data)
 print(missing_report)

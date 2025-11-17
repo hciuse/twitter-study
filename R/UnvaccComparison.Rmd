@@ -1,0 +1,206 @@
+---
+title: "COVID-19 Infection Comparison: Vaccinated vs. Unvaccinated"
+author: "LST"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width=10, fig.height=6)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(here)
+library(tidyr)
+```
+
+## Introduction
+
+This report compares COVID-19 infection frequencies between vaccinated and unvaccinated individuals.
+
+## Data Preparation
+
+```{r data-preparation}
+# Filter unvaccinated and vaccinated groups
+
+cleaned_data <- readRDS(file = here("data", "cleaned_data.rds"))
+unvacc <- cleaned_data %>% filter(c19_vaccination_status == "Nein")
+vacc <- cleaned_data %>% filter(c19_vaccination_status == "Ja")
+
+# Sample sizes
+n_unvacc <- nrow(unvacc)
+n_vacc <- nrow(vacc)
+n_total <- nrow(cleaned_data %>% filter(!is.na(c19_vaccination_status)))
+```
+
+**Sample Sizes:**
+
+- Unvaccinated: `r n_unvacc`
+- Vaccinated: `r n_vacc`
+- Total: `r n_total`
+- Current proportion unvaccinated: `r round(n_unvacc/n_total * 100, 2)`%
+
+## Comparison of Infection Frequencies
+
+```{r comparison-plot}
+# Calculate percentages for unvaccinated
+unvacc_counts <- table(unvacc$num_c19_infs)
+unvacc_pct <- prop.table(unvacc_counts) * 100
+
+# Calculate percentages for vaccinated
+vacc_counts <- table(vacc$num_c19_infs)
+vacc_pct <- prop.table(vacc_counts) * 100
+
+# Create comparison data frame
+infection_categories <- c("Nie", "Einmal", "Zweimal", "Dreimal", 
+                          "Mehr als dreimal", "Ich möchte nicht antworten")
+
+comparison_df <- data.frame(
+  Category = infection_categories,
+  Unvaccinated = sapply(infection_categories, function(x) {
+    ifelse(x %in% names(unvacc_pct), unvacc_pct[x], 0)
+  }),
+  Vaccinated = sapply(infection_categories, function(x) {
+    ifelse(x %in% names(vacc_pct), vacc_pct[x], 0)
+  })
+)
+
+# Reshape for plotting
+comparison_long <- comparison_df %>%
+  pivot_longer(cols = c(Unvaccinated, Vaccinated), 
+               names_to = "Group", 
+               values_to = "Percentage")
+
+# Set factor order for categories
+comparison_long$Category <- factor(comparison_long$Category, levels = infection_categories)
+
+# Create grouped bar plot
+ggplot(comparison_long, aes(x = Category, y = Percentage, fill = Group)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  scale_fill_manual(values = c("Unvaccinated" = "#E74C3C", "Vaccinated" = "#3498DB")) +
+  labs(title = "COVID-19 Infection Frequency: Vaccinated vs. Unvaccinated",
+       x = "Infection Frequency",
+       y = "Percentage (%)",
+       fill = "Vaccination Status") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+        legend.position = "top") +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 3)
+```
+
+## Reweighting Analysis: 13% Unvaccinated Scenario
+
+```{r reweighting-calculation}
+# Define target proportions
+target_unvacc_prop <- 0.13
+target_vacc_prop <- 1 - target_unvacc_prop
+
+# Current proportions
+current_unvacc_prop <- n_unvacc / n_total
+current_vacc_prop <- n_vacc / n_total
+
+# Scenario: If 13% were unvaccinated in same total sample size
+hypothetical_n_unvacc <- round(n_total * target_unvacc_prop)
+hypothetical_n_vacc <- n_total - hypothetical_n_unvacc
+
+# Calculate actual counts for each infection frequency category
+infection_categories <- c("Nie", "Einmal", "Zweimal", "Dreimal", 
+                          "Mehr als dreimal", "Ich möchte nicht antworten")
+
+# Actual counts in each group
+actual_counts_unvacc <- sapply(infection_categories, function(x) {
+  sum(unvacc$num_c19_infs == x, na.rm = TRUE)
+})
+
+actual_counts_vacc <- sapply(infection_categories, function(x) {
+  sum(vacc$num_c19_infs == x, na.rm = TRUE)
+})
+
+# Calculate proportions within each group
+prop_unvacc <- actual_counts_unvacc / n_unvacc
+prop_vacc <- actual_counts_vacc / n_vacc
+
+# Apply these proportions to hypothetical sample sizes
+expected_counts_unvacc <- hypothetical_n_unvacc * prop_unvacc
+expected_counts_vacc <- hypothetical_n_vacc * prop_vacc
+
+# Calculate total counts for actual and reweighted scenarios
+actual_total_counts <- actual_counts_unvacc + actual_counts_vacc
+expected_total_counts <- expected_counts_unvacc + expected_counts_vacc
+```
+
+### Sample Composition Comparison
+
+```{r sample-composition-plot}
+# Create sample composition data
+composition_data <- data.frame(
+  Scenario = rep(c("Actual Sample", "Reweighted (13% Unvacc)"), each = 2),
+  Group = rep(c("Unvaccinated", "Vaccinated"), 2),
+  Count = c(n_unvacc, n_vacc, hypothetical_n_unvacc, hypothetical_n_vacc),
+  Percentage = c(current_unvacc_prop * 100, current_vacc_prop * 100,
+                 target_unvacc_prop * 100, target_vacc_prop * 100)
+)
+
+composition_data$Scenario <- factor(composition_data$Scenario, 
+                                    levels = c("Actual Sample", "Reweighted (13% Unvacc)"))
+
+ggplot(composition_data, aes(x = Scenario, y = Percentage, fill = Group)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  scale_fill_manual(values = c("Unvaccinated" = "#E74C3C", "Vaccinated" = "#3498DB")) +
+  labs(title = "Sample Composition: Actual vs. Reweighted",
+       x = NULL,
+       y = "Percentage (%)",
+       fill = "Group") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+        legend.position = "top") +
+  geom_text(aes(label = sprintf("%.1f%%\n(n=%d)", Percentage, Count)), 
+            position = position_stack(vjust = 0.5), 
+            color = "white", size = 4, fontface = "bold")
+```
+
+### Total Infection Percentage Comparison
+
+```{r total-percentage-comparison-plot}
+# Create comparison data for actual vs expected (as percentages)
+reweight_comparison <- data.frame(
+  Category = infection_categories,
+  Actual_Count = actual_total_counts,
+  Expected_Count = expected_total_counts,
+  Actual_Pct = (actual_total_counts / n_total) * 100,
+  Expected_Pct = (expected_total_counts / n_total) * 100
+)
+
+reweight_comparison$Change_Pct <- reweight_comparison$Expected_Pct - reweight_comparison$Actual_Pct
+reweight_comparison$Category <- factor(reweight_comparison$Category, levels = infection_categories)
+
+# Reshape for plotting
+reweight_long <- reweight_comparison %>%
+  select(Category, Actual_Pct, Expected_Pct) %>%
+  pivot_longer(cols = c(Actual_Pct, Expected_Pct), 
+               names_to = "Scenario", 
+               values_to = "Percentage") %>%
+  mutate(Scenario = recode(Scenario, Actual_Pct = "Actual", Expected_Pct = "Expected"))
+
+ggplot(reweight_long, aes(x = Category, y = Percentage, fill = Scenario)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  scale_fill_manual(values = c("Actual" = "#95A5A6", "Expected" = "#E67E22")) +
+  labs(title = "Total Infection Percentages: Actual vs. Reweighted to 13% Unvaccinated",
+       x = "Infection Frequency",
+       y = "Percentage of Total Sample (%)",
+       fill = "Scenario") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+        legend.position = "top") +
+  geom_text(aes(label = sprintf("%.1f%%", Percentage)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 3)
+```

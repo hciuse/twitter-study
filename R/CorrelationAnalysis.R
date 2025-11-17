@@ -17,6 +17,7 @@ ext_survey_infections <- ext_survey_df %>%
   mutate(date = as.Date(date),
          week = floor_date(date, "week"),
          month = floor_date(date, "month")) %>%
+  filter(date >= as.Date("2019-01-01")) %>% # filter out invalid dates
   group_by(month) %>%
   summarise(ext_survey_count = n()) %>%
   arrange(month)
@@ -32,12 +33,13 @@ muspad_infections <- MuSPAD_df %>%
          thirdinfection = make_date(s22_positive_PCR_year_3, 
                                     s22_positive_PCR_month_3, 
                                     s22_positive_PCR_day_3)) %>%
-  select(firstinfection, secondinfection, thirdinfection) %>%
+  select(firstinfection, secondinfection, thirdinfection, s23_test_covid_2023, w22_positive_PCR_day_1) %>%
   pivot_longer(cols = everything(), names_to = "infection", values_to = "date") %>%
   filter(!is.na(date)) %>%
   mutate(date = as.Date(date),
          week = floor_date(date, "week"),
          month = floor_date(date, "month")) %>%
+  filter(date >= as.Date("2019-01-01")) %>%
   group_by(month) %>%
   summarise(muspad_count = n()) %>%
   arrange(month)
@@ -148,4 +150,4 @@ correlation_results <- data.frame(
 )
 
 #write_csv(correlation_results, "./correlation_results.csv")
-cat("Results saved to ./correlation_results.csv\n")
+#cat("Results saved to ./correlation_results.csv\n")
