@@ -275,6 +275,12 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
     }
 
     count_no_infections$DataSet <- factor(count_no_infections$DataSet, levels = c("External Survey", "MuSPAD", "RKI"))
+    
+    facet_labels <- c(
+      "External Survey" = "External Survey (N = 866)",
+      "MuSPAD" = "MuSPAD (N = 4,997)",
+      "RKI" = "RKI (Population)"
+    )
 
     StopMusPadData <- data.frame(date=as.Date(c("2022-12-13")), 
                                    event=c("Last Infection\nreported to MuSPAD"))
@@ -285,7 +291,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
         #geom_line(data=count_no_infections,  aes(x = Date, y = Incidence100000, color =DataSet), alpha = 0.2, size = 1.2) +
         theme_minimal() +
         xlab("Date") +
-        facet_wrap(~DataSet, nrow = 3, strip.position = "bottom") +
+        facet_wrap(~DataSet, nrow = 3, strip.position = "bottom", labeller = labeller(DataSet = facet_labels)) +
         geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-05-14")), color = "#990000", size = 1.5) +
         annotate("text", x=as.Date("2023-05-14"), y=1900, label="Last infection reported\nto MuSPAD", angle=90, size =10) +
         geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-08-13")), color = "#9900CC", size = 1.5) +
@@ -303,8 +309,10 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
           theme(axis.ticks.x = element_line(),
             axis.ticks.y = element_line(),
             axis.ticks.length = unit(12, "pt")) +
-        scale_x_date(breaks= seq(min(count_no_infections$Date), as.Date("2023-08-31"), by = "6 months"), date_labels = "%Y/%m")
-        theme(plot.title = element_text(hjust = 0.5)) 
+        scale_x_date(breaks= seq(min(count_no_infections$Date), as.Date("2023-08-31"), by = "6 months"), date_labels = "%Y/%m") +
+        theme(plot.title = element_text(hjust = 0.5),
+              plot.background = element_rect(fill = "white"),
+              panel.background = element_rect(fill = "white")) 
 
     ggarrange(ComSurveyRki, timelineplot2, labels = c("A", "B"), nrow = 2, ncol = 1,  align = "hv", font.label = list(size = 37), heights = c(1.1,0.22))
     

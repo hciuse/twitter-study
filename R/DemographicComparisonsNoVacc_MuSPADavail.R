@@ -474,7 +474,7 @@ OccupationDataMuspad$percent <- as.double(OccupationDataMuspad$percent)
 
 # Processing of federal statistical office data
 #Data stems from https://de.statista.com/statistik/daten/studie/1099494/umfrage/beschaeftigte-in-deutschland-nach-berufsgruppen/ [accessed: 2025-02-10]
-FedEmploymentAgency <- read_xlsx("./data/employment-germany-by-occupation-2024.xlsx", sheet = 2)
+FedEmploymentAgency <- read_xlsx("./data/employment-germany-by-occupation-2023.xlsx", sheet = 2)
 colnames(FedEmploymentAgency) <- c("occupation", "n")
 OccupationDataFedEmploymentAgency <- data.frame(matrix(nrow = 0, ncol = 3))
 other <- c("Berufe in Unternehmensführung, -organisation (Büro)", "Verkaufsberufe", "Verkehr, Logistik (außer Fahrzeugführung)", "Erziehung, soz., hauswirt. Berufe, Theologie", 

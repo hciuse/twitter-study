@@ -28,8 +28,26 @@ This report compares COVID-19 infection frequencies between vaccinated and unvac
 # Filter unvaccinated and vaccinated groups
 
 cleaned_data <- readRDS(file = here("data", "cleaned_data.rds"))
-unvacc <- cleaned_data %>% filter(c19_vaccination_status == "Nein")
-vacc <- cleaned_data %>% filter(c19_vaccination_status == "Ja")
+unvacc <- cleaned_data %>% filter(c19_vaccination_status == "Nein") %>%  mutate(
+  num_c19_infs_eng = case_when(
+    num_c19_infs == "Nie" ~ "0",
+    num_c19_infs == "Einmal" ~ "1",
+    num_c19_infs == "Zweimal" ~ "2+",
+    num_c19_infs == "Dreimal" ~ "2+",
+    num_c19_infs == "Mehr als dreimal" ~ "2+",
+    num_c19_infs == "Ich möchte nicht antworten" ~ "I Don't Want To Answer"
+  )
+)
+vacc <- cleaned_data %>% filter(c19_vaccination_status == "Ja") %>% mutate(
+  num_c19_infs_eng = case_when(
+    num_c19_infs == "Nie" ~ "0",
+    num_c19_infs == "Einmal" ~ "1",
+    num_c19_infs == "Zweimal" ~ "2+",
+    num_c19_infs == "Dreimal" ~ "2+",
+    num_c19_infs == "Mehr als dreimal" ~ "2+",
+    num_c19_infs == "Ich möchte nicht antworten" ~ "I Don't Want To Answer"
+  )
+)
 
 # Sample sizes
 n_unvacc <- nrow(unvacc)
@@ -56,8 +74,7 @@ vacc_counts <- table(vacc$num_c19_infs)
 vacc_pct <- prop.table(vacc_counts) * 100
 
 # Create comparison data frame
-infection_categories <- c("Nie", "Einmal", "Zweimal", "Dreimal", 
-                          "Mehr als dreimal", "Ich möchte nicht antworten")
+infection_categories <- c("0", "1", "2+", "I Don't Want To Answer")
 
 comparison_df <- data.frame(
   Category = infection_categories,

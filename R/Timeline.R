@@ -43,25 +43,34 @@ palette_twittermastodonsurvey_bars <- function(){
 }
 
 timelineplot <- ggplot(dfr %>% filter(source != "RKI")) +
-      geom_linerange(aes(y = name, 
-                         xmin = start.date,
-                         xmax = end.date,
-                         colour = source,
-                         linetype = type),
-                         linewidth = c(5, 2, 5, 2, 5, 2, 5, 5, 5, 2, 5, 2)) +
-      scale_x_date(breaks= seq(min(dfr$start.date), as.Date("2023-09-01"), by = "6 months"), date_labels = "%Y/%m")+
-      theme_minimal() +
-      scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
-      ylab("") +
-      ggtitle("Data Collection/Infection Occurence Timeline") +
-      theme(text = element_text(size = 48)) +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
-      guides(linetype = guide_legend(override.aes = list(linewidth = 2)))+
-      theme(axis.ticks.x = element_line(),
-        axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt")) +
-        theme(plot.title = element_text(hjust = 0.5),
-        legend.key.width = unit(1.5, 'cm'))
+  geom_linerange(
+    aes(
+      y = name,
+      xmin = start.date,
+      xmax = end.date,
+      colour = source,
+      linetype = type
+    ),
+    linewidth = c(5, 2, 5, 2, 5, 2, 5, 5, 5, 2, 5, 2)
+  ) +
+  scale_x_date(breaks = seq(min(dfr$start.date), as.Date("2023-09-01"), by = "6 months"),
+               date_labels = "%Y/%m") +
+  theme_minimal() +
+  scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
+  ylab("") +
+  ggtitle("Data Collection/Infection Occurence Timeline") +
+  theme(text = element_text(size = 48)) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
+  theme(
+    axis.ticks.x = element_line(),
+    axis.ticks.y = element_line(),
+    axis.ticks.length = unit(10, "pt"),
+    plot.title = element_text(hjust = 0.5),
+    legend.key.width = unit(1.5, 'cm'),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
 
 #Timeline plot excluding MuSPAD
 
@@ -118,7 +127,9 @@ timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
         theme(plot.title = element_text(hjust = 0.5),
-        legend.key.width = unit(1.5, 'cm'))
+        legend.key.width = unit(1.5, 'cm'),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #Timeline plot for vaccination figures
 palette_twittermastodonsurvey_bars <- function(){
@@ -126,25 +137,36 @@ palette_twittermastodonsurvey_bars <- function(){
 }
 
 timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External Survey", "RKI", "MuSPAD"))) +
-      geom_linerange(aes(y = name, 
-                         xmin = start.date,
-                         xmax = end.date,
-                         colour = source,
-                         linetype = type),
-                         linewidth = c(5, 2, 5, 5, 5, 5, 2)) +
-      theme_minimal() +
-      scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
-      ylab("") +
-      ggtitle("Data Collection/Infection Occurence Timeline") +
-      theme(text = element_text(size = 55)) +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
-      guides(linetype = guide_legend(override.aes = list(linewidth = 2)))+
-      theme(axis.ticks.x = element_line(),
-        axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt")) +
-        theme(plot.title = element_text(hjust = 0.5),
-        legend.key.width = unit(1.5, 'cm')) +
-      scale_x_date(breaks= seq(as.Date("2020-01-01"), as.Date("2023-08-31"), by = "6 months"), date_labels = "%Y/%m", expand = expansion(mult = c(0, 0.05)))
-
-
-
+  geom_linerange(
+    aes(
+      y = name,
+      xmin = start.date,
+      xmax = end.date,
+      colour = source,
+      linetype = type
+    ),
+    linewidth = c(5, 2, 5, 5, 5, 5, 2)
+  ) +
+  theme_minimal() +
+  scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
+  ylab("") +
+  ggtitle("Data Collection/Infection Occurence Timeline") +
+  theme(text = element_text(size = 55)) +
+  theme(legend.position = "bottom", legend.title = element_blank()) +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
+  theme(
+    axis.ticks.x = element_line(),
+    axis.ticks.y = element_line(),
+    axis.ticks.length = unit(10, "pt")
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    legend.key.width = unit(1.5, 'cm')
+  ) +
+  scale_x_date(
+    breaks = seq(as.Date("2020-01-01"), as.Date("2023-08-31"), by = "6 months"),
+    date_labels = "%Y/%m",
+    expand = expansion(mult = c(0, 0.05))
+  )

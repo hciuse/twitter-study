@@ -176,13 +176,15 @@ survey_doses <- ggplot(vaccinationData %>%
   scale_color_manual(values = palette_survey_errorbars()) +
   xlab("") +
   ylab("Share (Percentage)") +
-  ggtitle("External Survey") +
+  ggtitle("External Survey (N = 554)") +
   theme(text = element_text(size = 50)) +
   scale_y_continuous(labels = scales::percent) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Creation of RKI plot
 palette_rki_bars <- function() {
@@ -210,12 +212,14 @@ rki_doses <- ggplot(RkiVacc %>%
   scale_color_manual(values = palette_rki_errorbars()) +
   xlab("") +
   ylab("Share (Percentage)") +
-  ggtitle("RKI") + 
+  ggtitle("RKI (Population)") + 
   scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Creation of MuSPAD plot
 palette_muspad_bars <- function() {
@@ -244,12 +248,14 @@ muspad_doses <- ggplot(MuSPADVacc %>%
   scale_color_manual(values = palette_muspad_errorbars()) +
   xlab("") +
   ylab("Share (Percentage)") +
-  ggtitle("MuSPAD study") + 
+  ggtitle("MuSPAD study (N = 4037)") + 
   scale_y_continuous(labels = scales::percent) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) 
 
 # Layout and save plots
 ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))

@@ -89,35 +89,53 @@ InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 
 #Upper panel of Fig. 2
 #Confidence intervals based on: http://www.stat.yale.edu/Courses/1997-98/101/catinf.htm
-upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
+# Create a data frame for the sample size labels
+# Define new facet labels with sample sizes
+facet_labels <- c(
+  "Twitter" = "Twitter\n(N = 4,370)",
+  "Mastodon" = "Mastodon\n(N = 1,802)",
+  "External Survey" = "External Survey\n(N = 866)",
+  "MuSPAD" = "MuSPAD\n(N = 4,997)",
+  "COSMO" = "COSMO\n(N = 1,003)"
+)
+
+# Create the plot with custom facet labels
+upper_panel <- ext_survey_df %>%
+  filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
   count(num_c19_infs_eng) %>%
   mutate(percent = 100 * n / sum(n)) %>%
   mutate(Source = "External Survey") %>%
   mutate(sum = sum(n)) %>%
   rbind(InfectionsDataTwitter) %>%
   rbind(InfectionsDataMuspad) %>%
-  rbind(InfectionsDataCOSMO) %>% 
+  rbind(InfectionsDataCOSMO) %>%
   rbind(InfectionsDataMastodon) %>%
   mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO"))) %>%
-  ggplot(aes(num_c19_infs_eng, percent, fill=Source)) +
-  geom_bar(stat = "identity",  position = "dodge2", width = 0.85) +
+  ggplot(aes(num_c19_infs_eng, percent, fill = Source)) +
+  geom_bar(stat = "identity", position = "dodge2", width = 0.85) +
   theme_minimal() +
-  facet_wrap(~Source, nrow=1) +
+  facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
   theme(panel.spacing = unit(1, "cm")) +
   ylab("Share (Percentage)") +
   ggtitle("Number of Infections") +
   xlab("") +
   scale_fill_manual(values = palette_twittermastodonsurvey_bars()) +
   scale_color_manual(values = palette_twittermastodonsurvey_errorbars()) +
-  scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25,37.5, 50,75,100)) +
-  theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
-   #guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
-      theme(axis.ticks.x = element_line(size = 0.9), 
-                   axis.ticks.y = element_line(size = 1),
-                   axis.ticks.length = unit(20, "pt")) +
-      theme(plot.title = element_text(hjust = 0.5))
-
+  scale_y_continuous(
+    labels = scales::label_percent(scale = 1, accuracy = 0.5),
+    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
+  ) +
+  theme(
+    text = element_text(size = 50),
+    legend.position = "none",
+    legend.title = element_blank(),
+    axis.ticks.x = element_line(size = 0.9),
+    axis.ticks.y = element_line(size = 1),
+    axis.ticks.length = unit(20, "pt"),
+    plot.title = element_text(hjust = 0.5),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
 
 ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
 
@@ -177,22 +195,28 @@ InfectionsDataTwitter$percent <- 100*(InfectionsDataTwitter$percent)
 InfectionsDataTwitter$sum <- as.double(InfectionsDataTwitter$sum)
 
 # Creation of plot
-InfectionsDataTwitter %>% group_by(recruiter) %>%
+no_ci_plot <- InfectionsDataTwitter %>% group_by(recruiter) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(aes(fill=factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)"))), stat = "identity", position = "dodge", width = 0.8) +
   theme_minimal() +
   #facet_wrap(~name, nrow=2) +
   ylab("Share (Percentage)") +
-  xlab("Number of Infections") +
+  xlab("Number of Infections (Raw)") +
   scale_fill_manual(values = palette_recruiters_bars()) +
   scale_color_manual(values = palette_recruiters_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25, 37.5, 50,75,100)) +
   theme(text = element_text(size = 33)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt")) +
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) +
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
 ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.pdf", dpi = 500, w = 10, h = 7.5)
 ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.png", dpi = 500,  w = 10, h = 7.5)
+
+ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom")
+ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI_GLM.pdf", dpi = 500, w = 20, h = 7.5)
+ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI_GLM.png", dpi = 500,  w = 20, h = 7.5)

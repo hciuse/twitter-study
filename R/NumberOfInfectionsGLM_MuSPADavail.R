@@ -119,29 +119,64 @@ plot_data <- bind_rows(
   mutate(num_c19_infs_eng = factor(num_c19_infs_eng, levels = c("0", "1", "2+")))
 
 # Create plot with mixed model uncertainty bands
-plot_data %>%
+glm_plot <- plot_data %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
-  geom_bar(aes(fill = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", 
-                                                   "Recruiter 3", "Recruiter 4", 
-                                                   "Recruiter 5", "Recruiter 1 (Mastodon)"))), 
-           stat = "identity", position = "dodge", width = 0.8) +
-  geom_errorbar(aes(x = num_c19_infs_eng, ymin = lci, ymax = uci, 
-                    colour = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", 
-                                                          "Recruiter 3", "Recruiter 4", 
-                                                          "Recruiter 5", "Recruiter 1 (Mastodon)"))), 
-                position = position_dodge(0.8), width = 0.3, alpha = 0.9, size = 1.3) +
+  geom_bar(
+    aes(fill = factor(
+      recruiter,
+      levels = c(
+        "Recruiter 1 (Twitter)",
+        "Recruiter 2",
+        "Recruiter 3",
+        "Recruiter 4",
+        "Recruiter 5",
+        "Recruiter 1 (Mastodon)"
+      )
+    )),
+    stat = "identity",
+    position = "dodge",
+    width = 0.8
+  ) +
+  geom_errorbar(
+    aes(
+      x = num_c19_infs_eng,
+      ymin = lci,
+      ymax = uci,
+      colour = factor(
+        recruiter,
+        levels = c(
+          "Recruiter 1 (Twitter)",
+          "Recruiter 2",
+          "Recruiter 3",
+          "Recruiter 4",
+          "Recruiter 5",
+          "Recruiter 1 (Mastodon)"
+        )
+      )
+    ),
+    position = position_dodge(0.8),
+    width = 0.3,
+    alpha = 0.9,
+    size = 1.3
+  ) +
   theme_minimal() +
   ylab("Share (Percentage)") +
-  xlab("Number of Infections") +
+  xlab("Number of Infections (Estimated)") +
   scale_fill_manual(values = palette_recruiters_bars()) +
   scale_color_manual(values = palette_recruiters_errorbars()) +
-  scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), 
-                     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)) +
+  scale_y_continuous(
+    labels = scales::label_percent(scale = 1, accuracy = 0.5),
+    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
+  ) +
   theme(text = element_text(size = 33)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
-  theme(axis.ticks.x = element_line(),
-        axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(
+    axis.ticks.x = element_line(),
+    axis.ticks.y = element_line(),
+    axis.ticks.length = unit(5, "pt"),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
 ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5)

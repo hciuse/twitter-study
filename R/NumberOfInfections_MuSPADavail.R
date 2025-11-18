@@ -87,6 +87,14 @@ InfectionsDataCOSMO$n <- as.integer(InfectionsDataCOSMO$n)
 InfectionsDataCOSMO$percent <- as.double(InfectionsDataCOSMO$percent)
 InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 
+facet_labels <- c(
+  "Twitter" = "Twitter\n(N = 4,370)",
+  "Mastodon" = "Mastodon\n(N = 1,802)",
+  "External Survey" = "External Survey\n(N = 866)",
+  "MuSPAD" = "MuSPAD\n(N = 4,997)",
+  "COSMO" = "COSMO\n(N = 1,003)"
+)
+
 #Upper panel of Fig. 2
 #Confidence intervals based on: http://www.stat.yale.edu/Courses/1997-98/101/catinf.htm
 upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
@@ -107,7 +115,7 @@ upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Ans
   geom_bar(stat = "identity",  position = "dodge2", width = 0.85) +
   geom_errorbar(aes(x=num_c19_infs_eng, ymin=lci, ymax=uci, colour = Source), position = position_dodge2(padding = 30), width = 0.3, size=2) +
   theme_minimal() +
-  facet_wrap(~Source, nrow=1) +
+  facet_wrap(~Source, nrow=1, labeller = labeller(Source = facet_labels)) +
   theme(panel.spacing = unit(1, "cm")) +
   ylab("Share (Percentage)") +
   ggtitle("Number of Infections") +
@@ -117,11 +125,15 @@ upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Ans
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25,37.5, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank()) +
-   #guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
-      theme(axis.ticks.x = element_line(size = 0.9), 
-                   axis.ticks.y = element_line(size = 1),
-                   axis.ticks.length = unit(20, "pt")) +
-      theme(plot.title = element_text(hjust = 0.5))
+  #guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
+  theme(
+    axis.ticks.x = element_line(size = 0.9),
+    axis.ticks.y = element_line(size = 1),
+    axis.ticks.length = unit(20, "pt"),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  ) +
+  theme(plot.title = element_text(hjust = 0.5, ))
 
 
 ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
