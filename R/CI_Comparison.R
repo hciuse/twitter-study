@@ -148,7 +148,9 @@ ggplot(plot_data, aes(x = dose_label, y = p, color = method)) +
   scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
   theme(legend.position = "bottom",
         text = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 ggsave("./plots/CI_Comparison.pdf", width = 12, height = 8)
 ggsave("./plots/CI_Comparison.png", width = 12, height = 8, dpi = 300)

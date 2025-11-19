@@ -305,7 +305,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
         #ggtitle(age_group) +
         theme(text = element_text(size = 55)) +
         scale_y_continuous(breaks = c (0,500,1000,1500,2000,2500), limits=c(0,2750)) +
-        theme(legend.position = "none", legend.title = element_blank()) +
+        theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
           theme(axis.ticks.x = element_line(),
             axis.ticks.y = element_line(),
             axis.ticks.length = unit(12, "pt")) +

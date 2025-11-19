@@ -71,7 +71,9 @@ GenderPlot <- GenderData %>%
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Age ---------------------------------------------------------------------
 
@@ -117,7 +119,9 @@ AgePlot <- AgeData %>%
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Household Size ----------------------------------------------------
 
@@ -161,7 +165,9 @@ HouseholdPlot <- HouseholdData %>%
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Children under 14 ------------------------------------------------------------------
 
@@ -254,7 +260,9 @@ EducationPlot <- educationLevel %>%
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust = 0.7))
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust = 0.7),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Occupation --------------------------------------------------
 
@@ -304,7 +312,9 @@ OccupationPlot <- currentOccupation %>%
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust = 0.7))
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust = 0.7),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Layout and save plots
 ggarrange(GenderPlot, AgePlot, HouseholdPlot, ChildrenPlot, EducationPlot, OccupationPlot, 

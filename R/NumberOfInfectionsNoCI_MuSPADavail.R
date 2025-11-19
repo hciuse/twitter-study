@@ -2,6 +2,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(ggpubr)
 library(readxl)
+library(here)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
@@ -92,8 +93,8 @@ InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 # Create a data frame for the sample size labels
 # Define new facet labels with sample sizes
 facet_labels <- c(
-  "Twitter" = "Twitter\n(N = 4,370)",
-  "Mastodon" = "Mastodon\n(N = 1,802)",
+  "Twitter" = "Twitter\n(N = 4,217)",
+  "Mastodon" = "Mastodon\n(N = 1,764)",
   "External Survey" = "External Survey\n(N = 866)",
   "MuSPAD" = "MuSPAD\n(N = 4,997)",
   "COSMO" = "COSMO\n(N = 1,003)"
@@ -129,6 +130,7 @@ upper_panel <- ext_survey_df %>%
     text = element_text(size = 50),
     legend.position = "none",
     legend.title = element_blank(),
+    legend.background = element_rect("white"),
     axis.ticks.x = element_line(size = 0.9),
     axis.ticks.y = element_line(size = 1),
     axis.ticks.length = unit(20, "pt"),

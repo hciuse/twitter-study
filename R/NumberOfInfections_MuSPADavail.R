@@ -88,8 +88,8 @@ InfectionsDataCOSMO$percent <- as.double(InfectionsDataCOSMO$percent)
 InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 
 facet_labels <- c(
-  "Twitter" = "Twitter\n(N = 4,370)",
-  "Mastodon" = "Mastodon\n(N = 1,802)",
+  "Twitter" = "Twitter\n(N = 4,217)",
+  "Mastodon" = "Mastodon\n(N = 1,764)",
   "External Survey" = "External Survey\n(N = 866)",
   "MuSPAD" = "MuSPAD\n(N = 4,997)",
   "COSMO" = "COSMO\n(N = 1,003)"
@@ -124,7 +124,7 @@ upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Ans
   scale_color_manual(values = palette_twittermastodonsurvey_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25,37.5, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   #guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
   theme(
     axis.ticks.x = element_line(size = 0.9),
@@ -210,10 +210,12 @@ InfectionsDataTwitter %>% group_by(recruiter) %>%
   scale_color_manual(values = palette_recruiters_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25, 37.5, 50,75,100)) +
   theme(text = element_text(size = 33)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt")) +
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) +
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
 ggsave("./plots/NoInfections_Comparison_Recruiter.pdf", dpi = 500, w = 10, h = 7.5)

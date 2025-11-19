@@ -60,7 +60,7 @@ timelineplot <- ggplot(dfr %>% filter(source != "RKI")) +
   ylab("") +
   ggtitle("Data Collection/Infection Occurence Timeline") +
   theme(text = element_text(size = 48)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
   theme(
     axis.ticks.x = element_line(),
@@ -121,7 +121,7 @@ timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
       ylab("") +
       ggtitle("Data Collection/Infection Occurence Timeline") +
       theme(text = element_text(size = 48)) +
-      theme(legend.position = "bottom", legend.title = element_blank()) +
+      theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
       guides(linetype = guide_legend(override.aes = list(linewidth = 2)))+
       theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
@@ -152,7 +152,7 @@ timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External Survey", "RKI", "
   ylab("") +
   ggtitle("Data Collection/Infection Occurence Timeline") +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
   theme(
     axis.ticks.x = element_line(),

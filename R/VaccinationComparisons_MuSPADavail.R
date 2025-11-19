@@ -137,7 +137,7 @@ ggplot(aes(value_eng, percent)) +
   xlab("Vaccination Supplier") +
   scale_fill_manual(values = palette_surveymuspadrki_bars()) +
   scale_color_manual(values = palette_surveymuspadrki_errorbars()) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(text = element_text(size = 55)) +
   theme(panel.spacing = unit(3, "lines")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))  +
@@ -310,7 +310,7 @@ aes(x = name,  y = percent)) +
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_survey_bars()) +
   scale_color_manual(values = palette_survey_errorbars()) +
   xlab("") +
@@ -321,7 +321,9 @@ aes(x = name,  y = percent)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-        theme(plot.title = element_text(hjust = 0.5))
+        theme(plot.title = element_text(hjust = 0.5),
+              plot.background = element_rect(fill = "white"),
+              panel.background = element_rect(fill = "white"))
 
 # Creation of RKI plot
 palette_rki_bars <- function() {
@@ -344,7 +346,7 @@ aes(x = name,  y = percent)) +
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_rki_bars()) +
   scale_color_manual(values = palette_rki_errorbars()) +
   xlab("") +
@@ -354,7 +356,9 @@ aes(x = name,  y = percent)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
-        theme(plot.title = element_text(hjust = 0.5))
+        theme(plot.title = element_text(hjust = 0.5),
+              plot.background = element_rect(fill = "white"),
+              panel.background = element_rect(fill = "white"))
 
 # Creation of MuSPAD plot
 palette_muspad_bars <- function() {
@@ -378,7 +382,7 @@ aes(x = name,  y = percent)) +
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_muspad_bars()) +
   scale_color_manual(values = palette_muspad_errorbars()) +
   xlab("") +
@@ -388,7 +392,9 @@ aes(x = name,  y = percent)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
-        theme(plot.title = element_text(hjust = 0.5)) 
+        theme(plot.title = element_text(hjust = 0.5),
+              plot.background = element_rect(fill = "white"),
+              panel.background = element_rect(fill = "white")) 
 
 # Layout and save plots
 ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))

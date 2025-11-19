@@ -171,7 +171,7 @@ survey_doses <- ggplot(vaccinationData %>%
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_survey_bars()) +
   scale_color_manual(values = palette_survey_errorbars()) +
   xlab("") +
@@ -207,7 +207,7 @@ rki_doses <- ggplot(RkiVacc %>%
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_rki_bars()) +
   scale_color_manual(values = palette_rki_errorbars()) +
   xlab("") +
@@ -243,7 +243,7 @@ muspad_doses <- ggplot(MuSPADVacc %>%
   geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   scale_fill_manual(values = palette_muspad_bars()) +
   scale_color_manual(values = palette_muspad_errorbars()) +
   xlab("") +

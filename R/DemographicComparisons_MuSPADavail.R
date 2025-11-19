@@ -76,10 +76,12 @@ ggplot(aes(gender, percent)) +
   scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/Gender_Comparison.pdf", GenderPlot, dpi = 500, w = 9.5, h = 6)
 #ggsave("./plots/Gender_Comparison.png", GenderPlot, dpi = 500, w = 9.5, h = 6)
@@ -150,10 +152,12 @@ ggplot(aes(age_bracket, percent)) +
   scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/Age_Comparison.pdf", dpi = 500, w = 9.5, h = 6)
 #ggsave("./plots/Age_Comparison.png", dpi = 500, w = 9.5, h = 6)
@@ -262,10 +266,12 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
   scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/HouseholdSize.png", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
 #ggsave("./plots/HouseholdSize.pdf", HouseholdPlot, dpi = 500, w = 9.5, h = 6)
@@ -336,10 +342,12 @@ ggplot(aes(total_hsld_size_persons_under_14, percent)) +
   scale_color_manual(values=palette_surveymuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/Children_Comparison.png", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
 #ggsave("./plots/Children_Comparison.pdf", ChildrenPlot, dpi = 500, w = 9.5, h = 6)
@@ -419,11 +427,13 @@ ggplot(aes(highest_educational_qualification, percent)) +
   scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7))
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/EducationLevel_Comparison.pdf", EducationPlot, dpi = 500, w =9.5, h = 9)
 #ggsave("./plots/EducationLevel_Comparison.png", EducationPlot, dpi = 500, w =9.5, h = 9)
@@ -520,11 +530,13 @@ ggplot(aes(current_occupation, percent)) +
   scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7))
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 #ggsave("./plots/Occupation_Comparison.pdf", OccupationPlot, dpi = 500, w =9.5, h = 9)
 #ggsave("./plots/Occupation_Comparison.png", OccupationPlot, dpi = 500, w =9.5, h = 9)

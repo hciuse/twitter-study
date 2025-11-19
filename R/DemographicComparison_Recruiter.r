@@ -86,7 +86,9 @@ ggplot(aes(gender, percent)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt")) +
+        axis.ticks.length = unit(10, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) +
         guides(fill=guide_legend(nrow=4), color=guide_legend(nrow=4))
 
 
@@ -164,7 +166,9 @@ ggplot(aes(factor(age_bracket, levels = c("18-39", "40-59", "60-79", "80-99")), 
   #guides(fill=guide_legend(nrow=3,byrow=TRUE), color=guide_legend(nrow=3,byrow=TRUE)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt"))
+        axis.ticks.length = unit(10, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Household Size ----------------------------------------------------
 
@@ -231,7 +235,9 @@ HouseholdPlot <- HouseholdData %>% filter(!is.na(ref))  %>% group_by(ref) %>% fi
   theme(legend.position = "none", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt"))
+        axis.ticks.length = unit(5, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 # Children under 14 ------------------------------------------------------------------
 
@@ -290,7 +296,9 @@ ggplot(aes(respondent_hsld_size_persons_under_14, percent)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt")) 
+        axis.ticks.length = unit(10, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) 
 
 # Education / Occupation --------------------------------------------------
 
@@ -365,7 +373,9 @@ ggplot(aes(factor(highest_educational_qualification, levels = c("Higher Educatio
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7)) +
-  guides(fill=guide_legend(nrow=4), color=guide_legend(nrow=4))
+  guides(fill=guide_legend(nrow=4), color=guide_legend(nrow=4),
+         plot.background = element_rect(fill = "white"),
+         panel.background = element_rect(fill = "white"))
 
 #Occupation
 
@@ -461,9 +471,13 @@ ggplot(aes(current_occupation, percent)) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
-        axis.ticks.length = unit(10, "pt")) +
+        axis.ticks.length = unit(10, "pt"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.75, hjust=0.7))+
-    guides(fill=guide_legend(nrow=7), color=guide_legend(nrow=7))
+    guides(fill=guide_legend(nrow=7), color=guide_legend(nrow=7),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"))
 
 
 # Layout and save plots
