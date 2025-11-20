@@ -20,8 +20,10 @@ If you have access to the MuSPAD data, you may run the following scripts:
 - `Timeline.R`: Creates timeline subplots. Automatically called when necessary in the scripts below.
 - `NumberOfInfectionsMuSPADavail.R`: This file contains code to produce Figure 2 and Figure 5.
 - `Plot7DayIncidence_MuSPADavail.R`: This file contains code to produce Figure 3 and Figure Figure 7.
-- `VaccinationComparisons_MuSPADavail.R`: This file contains code to produce Figure 4 and Figure S4.
+- `VaccinationComparisonsNo8099_MuSPADavail.R`: This file contains code to produce Figure 4.
+- `VaccinationComparisons_MuSPADavail.R`: This file contains code to produce Figure S4.
 - `DemographicComparison_MuSPADavail.R`: This file contains code to produce Figure 6.
+- `DemographicComparisonVaccNoVaccNA.R`: This file contains code to produce Figure S7.
 - `TimingOfInfection_MuSPADavail.R`: This file contains code to produce Figure S1.
 - `DemographicComparison_Recruiter.R`: This file contains code to produce Figure S2 and S3.
 
@@ -44,7 +46,7 @@ To reproduce the plots found in the paper, follow these steps:
 2. Call `renv::restore()` from the R terminal
 3. Put the preprocessed data from OSF into the folder called "data"
    - The cleaned data set called `cleaned_data.rds`
-   - The XLSX file called `employment-germany-by-occupation-2023.xlsx`
+   - The XLSX file called `employment-germany-by-occupation-2023.xlsx`. Retrieved from Destatis 
    - If you have access to the MuSPAD data, put the `muspad_22-Nov-2022.rds` and `MuSPAD_data_subset.csv` files in the data folder
 4. Now you can run the scripts in the `R` folder to reproduce the plots
 5. The resulting plots can be found in the `plots` folder. Each scripts generates a PDF and PNG version of the plot
