@@ -129,6 +129,24 @@ InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 InfectionsDataExternal <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
   count(num_c19_infs_eng)
 
+# Chi-squared tests comparing each source to MuSPAD reference distribution
+
+# External survey chi-squared test
 ext_ctest <- chisq.test(InfectionsDataExternal$n, p = InfectionsDataMuspad$n /
                           sum(InfectionsDataMuspad$n))
 w_ext <- sqrt(ext_ctest$statistic / sum(InfectionsDataExternal$n))
+
+# Twitter chi-squared test
+twitter_ctest <- chisq.test(InfectionsDataTwitter$n, p = InfectionsDataMuspad$n /
+                              sum(InfectionsDataMuspad$n))
+w_twitter <- sqrt(twitter_ctest$statistic / sum(InfectionsDataTwitter$n))
+
+# Mastodon chi-squared test
+mastodon_ctest <- chisq.test(InfectionsDataMastodon$n, p = InfectionsDataMuspad$n /
+                               sum(InfectionsDataMuspad$n))
+w_mastodon <- sqrt(mastodon_ctest$statistic / sum(InfectionsDataMastodon$n))
+
+# COSMO chi-squared test
+cosmo_ctest <- chisq.test(InfectionsDataCOSMO$n, p = InfectionsDataMuspad$n /
+                            sum(InfectionsDataMuspad$n))
+w_cosmo <- sqrt(cosmo_ctest$statistic / sum(InfectionsDataCOSMO$n))
