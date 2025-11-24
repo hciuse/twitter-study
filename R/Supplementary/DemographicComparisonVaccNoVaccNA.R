@@ -68,7 +68,7 @@ GenderPlot <- GenderData %>%
   scale_color_manual(values = palette_vacc_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25,50,75,100)) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "bottom", legend.title = element_blank()) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),

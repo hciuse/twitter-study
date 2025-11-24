@@ -258,11 +258,11 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
 
     if(MuSPADavail == "yes"){
     palette_surveyrki_bars <- function() {
-      c("#9900CC", "#9fadaf", "#990000")
+      c("#9900CC", "#9fadaf", "#DC143C")
     }
 
     palette_surveyrki_errorbars <- function() {
-      c("#640085", "#4a5253", "#5c0000")
+      c("#640085", "#4a5253", "#A00F28")
     }
     } else if(MuSPADavail == "no"){
     palette_surveyrki_bars <- function() {
@@ -292,7 +292,7 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
         theme_minimal() +
         xlab("Date") +
         facet_wrap(~DataSet, nrow = 3, strip.position = "bottom", labeller = labeller(DataSet = facet_labels)) +
-        geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-05-14")), color = "#990000", size = 1.5) +
+        geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-05-14")), color = "#DC143C", size = 1.5) +
         annotate("text", x=as.Date("2023-05-14"), y=1900, label="Last infection reported\nto MuSPAD", angle=90, size =10) +
         geom_vline(data = count_no_infections, mapping = aes(xintercept = as.Date("2023-08-13")), color = "#9900CC", size = 1.5) +
         annotate("text", x=as.Date("2023-08-13"), y=1900, label="Last infections reported\nto external survey", angle=90, size = 10) +

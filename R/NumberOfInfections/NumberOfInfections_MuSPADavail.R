@@ -3,23 +3,23 @@ library(RColorBrewer)
 library(ggpubr)
 library(readxl)
 library(here)
+library(ggpattern)
+library(here)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
-here()
-ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
-source("./R/Timeline.R")
-source("./R/MuSPADPreprocessing.R") #Todo: Update once repo has been reorganized
+ext_survey_df <- readRDS(file = here("data", "cleaned_data.rds"))
+source(here("R", "Timeline.R"))
+source(here("R", "MuSPADPreprocessing.R"))
 
 # Number of infections ----------------------------------------------------
 
 # Creation of palette for comparison of twittwr, mastodon, external survey, MuSPAD, and COSMO
 palette_twittermastodonsurvey_bars <- function() {
-  c("#41b6c4", "#663300", "#9900CC", "#990000", "#CC3300")
+  c("#41b6c4", "#33A02C", "#9900CC", "#DC143C", "#FF6B35")
 }
-
 palette_twittermastodonsurvey_errorbars <- function() {
-  c("#2d7e87", "#261300", "#640085", "#5c0000", "#771f01")
+  c("#2d7e87", "#1F661E", "#640085", "#A00F28", "#CC4420")
 }
 
 # Procession of Twitter data
@@ -98,44 +98,80 @@ facet_labels <- c(
 
 #Upper panel of Fig. 2
 #Confidence intervals based on: http://www.stat.yale.edu/Courses/1997-98/101/catinf.htm
-upper_panel <- ext_survey_df %>% filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
+upper_panel <- ext_survey_df %>%
+  filter(num_c19_infs_eng != "I Don't Want To Answer") %>%
   count(num_c19_infs_eng) %>%
-  mutate(percent = 100 * n / sum(n)) %>%
-  mutate(Source = "External Survey") %>%
-  mutate(sum = sum(n)) %>%
+  mutate(percent = 100 * n / sum(n),
+         Source = "External Survey",
+         sum = sum(n)) %>%
   rbind(InfectionsDataTwitter) %>%
   rbind(InfectionsDataMuspad) %>%
   rbind(InfectionsDataCOSMO) %>% 
   rbind(InfectionsDataMastodon) %>%
-  mutate(lci = (n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-  mutate(lci = 100*lci) %>%
-  mutate(uci = (n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-  mutate(uci = 100*uci) %>%
-  mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO"))) %>%
-  ggplot(aes(num_c19_infs_eng, percent, fill=Source)) +
-  geom_bar(stat = "identity",  position = "dodge2", width = 0.85) +
-  geom_errorbar(aes(x=num_c19_infs_eng, ymin=lci, ymax=uci, colour = Source), position = position_dodge2(padding = 30), width = 0.3, size=2) +
+  mutate(
+    lci = 100 * ((n/sum) - 1.96*sqrt((n/sum * (1 - n/sum))/sum)),
+    uci = 100 * ((n/sum) + 1.96*sqrt((n/sum * (1 - n/sum))/sum)),
+    Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO")),
+    # Create manual color columns
+    bar_color = palette_twittermastodonsurvey_bars()[as.numeric(Source)],
+    errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)]
+  ) %>%
+  ggplot(aes(num_c19_infs_eng, percent)) +  
+  
+  geom_bar(
+    stat = "identity",
+    position = position_dodge2(width = 0.85),
+    fill = NA,
+    aes(color = bar_color),
+    linewidth = 1
+  ) +
+  
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.85),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = Source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.02,
+  ) +
+  
+  geom_errorbar(
+    aes(ymin = lci, ymax = uci, color = errorbar_color),
+    position = position_dodge2(padding = 30),
+    width = 0.3,
+    linewidth = 2
+  ) +
+  
+  facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
   theme_minimal() +
-  facet_wrap(~Source, nrow=1, labeller = labeller(Source = facet_labels)) +
-  theme(panel.spacing = unit(1, "cm")) +
   ylab("Share (Percentage)") +
   ggtitle("Number of Infections") +
   xlab("") +
-  scale_fill_manual(values = palette_twittermastodonsurvey_bars()) +
-  scale_color_manual(values = palette_twittermastodonsurvey_errorbars()) +
-  scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25,37.5, 50,75,100)) +
-  theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
-  #guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
+  
+  scale_pattern_fill_manual(values = palette_twittermastodonsurvey_bars()) +
+  scale_color_identity() +
+  
+  scale_y_continuous(
+    labels = scales::label_percent(scale = 1, accuracy = 0.5),
+    breaks = c(0,12.5,25,37.5,50,75,100)
+  ) +
+  
   theme(
-    axis.ticks.x = element_line(size = 0.9),
-    axis.ticks.y = element_line(size = 1),
+    text = element_text(size = 50),
+    legend.position = "none",
+    legend.title = element_blank(),
+    legend.background = element_rect("white"),
+    axis.ticks.x = element_line(linewidth = 0.9),
+    axis.ticks.y = element_line(linewidth = 1),
     axis.ticks.length = unit(20, "pt"),
     plot.background = element_rect(fill = "white"),
-    panel.background = element_rect(fill = "white")
-  ) +
-  theme(plot.title = element_text(hjust = 0.5, ))
-
+    panel.background = element_rect(fill = "white"),
+    plot.title = element_text(hjust = 0.5)
+  )
 
 ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
 

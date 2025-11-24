@@ -14,11 +14,11 @@ source("./R/Timeline.R")
 
 # Creation of palette for comparison of twittwr, mastodon, external survey, and COSMO
 palette_twittermastodonsurvey_bars <- function() {
-  c("#41b6c4", "#663300", "#9900CC", "#CC3300")
+  c("#41b6c4", "#33A02C", "#9900CC", "#DC143C", "#FF6B35")
 }
 
 palette_twittermastodonsurvey_errorbars <- function() {
-  c("#2d7e87", "#261300", "#640085", "#771f01")
+  c("#2d7e87", "#1F661E", "#640085", "#A00F28", "#CC4420")
 }
 
 # Procession of Twitter data

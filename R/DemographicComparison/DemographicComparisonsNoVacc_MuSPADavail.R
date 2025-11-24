@@ -13,10 +13,10 @@ source("./R/MuspadPreprocessing.R")
 
 #Creation of palette for comparison of external survey, federal office of statistics, and MuSPAD
 palette_surveyfedmuspad_bars <- function() {
-  c("#9900CC", "#151515", "#990000")
+  c("#9900CC", "#151515", "#DC143C")
 }
 palette_surveyfedmuspad_errorbars <- function() {
-   c("#640085", "#000000", "#5c0000")
+   c("#640085", "#000000", "#A00F28")
 }
 
 # Gender ------------------------------------------------------------------
@@ -280,11 +280,11 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
 
 # Creation of external survey/MuSPAD color palette (no data available by federal statistical office)
 palette_surveymuspad_bars <- function() {
-  c("#9900CC", "#990000")
+  c("#9900CC", "#DC143C")
 }
 
 palette_surveymuspad_errorbars <- function() {
-   c("#640085", "#5c0000")
+   c("#640085", "#A00F28")
 }
 
 # Processing of external survey data

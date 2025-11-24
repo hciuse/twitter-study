@@ -39,7 +39,7 @@ dfr <- data.frame(
 mdfr <- reshape2::melt(dfr, measure.vars = c("start.date", "end.date"))
 
 palette_twittermastodonsurvey_bars <- function(){
-  c("#CC3300", "#9900CC",  "#663300", "#990000", "#41b6c4")
+  c("#FF6B35", "#9900CC",  "#33A02C", "#DC143C", "#41b6c4")
 }
 
 timelineplot <- ggplot(dfr %>% filter(source != "RKI")) +
@@ -104,8 +104,8 @@ dfr_noMuSPAD <- data.frame(
 
 mdfr <- reshape2::melt(dfr, measure.vars = c("start.date", "end.date"))
 
-palette_twittermastodonsurvey_bars <- function(){
-  c("#CC3300", "#9900CC",  "#663300", "#990000", "#41b6c4")
+palette_twittermastodonsurvey_bars <- function() {
+  c("#41b6c4", "#33A02C", "#9900CC", "#DC143C", "#FF6B35")
 }
 
 timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
@@ -133,7 +133,7 @@ timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
 
 #Timeline plot for vaccination figures
 palette_twittermastodonsurvey_bars <- function(){
-  c("#9900CC", "#990000", "#9fadaf")
+  c("#9900CC", "#DC143C", "#9fadaf")
 }
 
 timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External Survey", "RKI", "MuSPAD"))) +
