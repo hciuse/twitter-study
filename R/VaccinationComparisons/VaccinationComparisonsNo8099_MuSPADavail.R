@@ -4,13 +4,13 @@ library(cowplot)
 library(ggpubr)
 library(readxl)
 library(here)
+library(ggpattern)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
-here()
-ext_survey_df <- readRDS(file = "./data/cleaned_data.rds")
-source("./R/Timeline.R")
-source("./R/MuSPADPreprocessing.R")
+ext_survey_df <- readRDS(file = here("data", "cleaned_data.rds"))
+source(here("R", "Timeline.R"))
+source(here("R", "MuSPADPreprocessing.R"))
 
 # Number of Vaccinations -------------------------------------------------------------
 
@@ -153,63 +153,148 @@ MuSPADVacc$percent <- as.double(MuSPADVacc$percent)
 palette_survey_bars <- function() {
   c("#c084d4", "#b646db", "#9900CC")
 }
-
 palette_survey_errorbars <- function() {
   c("#9900CC", "#730099", "#400155")
 }
-
-survey_doses <- ggplot(vaccinationData %>%
-                         filter(name != "Received 0 doses") %>%
-                         mutate(lci = groupsize*(n/groupsize - 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
-                         mutate(lci = lci/groupsize) %>%
-                         mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
-                         mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
-                         mutate(uci = uci/groupsize) %>%
-                         mutate(uci = case_when(uci > 1 ~ 1, .default= uci)),
-                       aes(x = name,  y = percent)) +
-  geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
+survey_doses <- ggplot(
+  vaccinationData %>%
+    filter(name != "Received 0 doses") %>%
+    mutate(lci = groupsize * (n / groupsize - 1.96 *
+                                (((n / groupsize * (1 - n / groupsize)) / groupsize
+                                )^0.5))) %>%
+    mutate(lci = lci / groupsize) %>%
+    mutate(lci = case_when(lci < 0 ~ 0, .default = lci)) %>%
+    mutate(uci = groupsize * (n / groupsize + 1.96 *
+                                (((n / groupsize * (1 - n / groupsize)) / groupsize
+                                )^0.5))) %>%
+    mutate(uci = uci / groupsize) %>%
+    mutate(uci = case_when(uci > 1 ~ 1, .default = uci)) %>%
+    mutate(
+      agegroup = factor(agegroup),  # Ensure it's a factor
+      bar_color = palette_survey_bars()[as.numeric(agegroup)], 
+      errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)]
+    ),
+  aes(x = name, y = percent)
+) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    aes(color = bar_color, group = agegroup),
+    linewidth = 1
+  ) +
+  
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = agegroup, group = agegroup),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.02
+  ) +
+  geom_errorbar(
+    aes(
+      x = name,
+      ymin = lci,
+      ymax = uci,
+      color = errorbar_color,
+      group = agegroup
+    ),
+    position = position_dodge(0.9),
+    width = 0.5,
+    size = 2,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_survey_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
-  scale_fill_manual(values = palette_survey_bars()) +
-  scale_color_manual(values = palette_survey_errorbars()) +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.background = element_rect("white")
+  ) +
   xlab("") +
   ylab("Share (Percentage)") +
   ggtitle("External Survey (N = 554)") +
   theme(text = element_text(size = 50)) +
   scale_y_continuous(labels = scales::percent) +
-  theme(axis.ticks.x = element_line(),
-        axis.ticks.y = element_line(),
-        axis.ticks.length = unit(5, "pt")) +
-  theme(plot.title = element_text(hjust = 0.5),
-        plot.background = element_rect(fill = "white"),
-        panel.background = element_rect(fill = "white"))
+  theme(
+    axis.ticks.x = element_line(),
+    axis.ticks.y = element_line(),
+    axis.ticks.length = unit(5, "pt")
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white")
+  )
 
 # Creation of RKI plot
 palette_rki_bars <- function() {
   c("#c0cad2", "#6d7b88")
 }
-
 palette_rki_errorbars <- function() {
   c("#3e464d", "#1f2326")
 }
-
 rki_doses <- ggplot(RkiVacc %>%
                       filter(name != "Received 0 doses") %>%
                       mutate(lci = groupsize*(n/groupsize - 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
                       mutate(lci = lci/groupsize) %>%
                       mutate(lci = case_when(lci < 0 ~ 0, lci == 1 ~ 0, .default= lci)) %>%
                       mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
-                      mutate(uci = uci/groupsize), 
+                      mutate(uci = uci/groupsize) %>%
+                      mutate(
+                        agegroup = factor(agegroup),
+                        bar_color = palette_rki_bars()[as.numeric(agegroup)],
+                        errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)]
+                      ), 
                     aes(x = name,  y = percent)) +
-  geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    aes(color = bar_color, group = agegroup),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = agegroup, group = agegroup),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.02
+  ) +
+  geom_errorbar(
+    aes(
+      x = name,
+      ymin = lci,
+      ymax = uci,
+      color = errorbar_color,
+      group = agegroup
+    ),
+    position = position_dodge(0.9),
+    width = 0.5,
+    size = 2,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_rki_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
-  scale_fill_manual(values = palette_rki_bars()) +
-  scale_color_manual(values = palette_rki_errorbars()) +
   xlab("") +
   ylab("Share (Percentage)") +
   ggtitle("RKI (Population)") + 
@@ -225,11 +310,9 @@ rki_doses <- ggplot(RkiVacc %>%
 palette_muspad_bars <- function() {
   c("#e79393", "#d24747", "#cc0202", "#6d0101")
 }
-
 palette_muspad_errorbars <- function() {
   c("#cc0202", "#6d0101", "#350000", "#260000")
 }
-
 muspad_doses <- ggplot(MuSPADVacc %>%
                          filter(!is.na(agegroup)) %>%
                          filter(name != "Received 0 doses") %>%
@@ -237,15 +320,52 @@ muspad_doses <- ggplot(MuSPADVacc %>%
                          mutate(lci = lci/groupsize) %>%
                          mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
                          mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
-                         mutate(uci = uci/groupsize), 
+                         mutate(uci = uci/groupsize) %>%
+                         mutate(
+                           agegroup = factor(agegroup),
+                           bar_color = palette_muspad_bars()[as.numeric(agegroup)],
+                           errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)]
+                         ), 
                        aes(x = name,  y = percent)) +
-  geom_bar(stat = "identity", position="dodge", aes(fill = agegroup)) +
-  geom_errorbar(aes(x=name, ymin=lci, ymax=uci, colour = agegroup), position = position_dodge(0.9), width = 0.5, size=2) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    aes(color = bar_color, group = agegroup),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.9, preserve = "single"),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = agegroup, group = agegroup),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.02
+  ) +
+  geom_errorbar(
+    aes(
+      x = name,
+      ymin = lci,
+      ymax = uci,
+      color = errorbar_color,
+      group = agegroup
+    ),
+    position = position_dodge(0.9),
+    width = 0.5,
+    size = 2,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_muspad_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
-  scale_fill_manual(values = palette_muspad_bars()) +
-  scale_color_manual(values = palette_muspad_errorbars()) +
   xlab("") +
   ylab("Share (Percentage)") +
   ggtitle("MuSPAD study (N = 4037)") + 
@@ -255,8 +375,7 @@ muspad_doses <- ggplot(MuSPADVacc %>%
         axis.ticks.length = unit(10, "pt")) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(fill = "white"),
-        panel.background = element_rect(fill = "white")) 
-
+        panel.background = element_rect(fill = "white"))
 # Layout and save plots
 ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))
 

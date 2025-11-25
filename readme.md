@@ -18,14 +18,15 @@ If you have access to the MuSPAD data, you may run the following scripts:
 
 - `MuSPADPreprocessing.R`: Preprocessing of MuSPAD data. Automatically called when executing the scripts below.
 - `Timeline.R`: Creates timeline subplots. Automatically called when necessary in the scripts below.
-- `NumberOfInfections/NumberOfInfectionsMuSPADavail.R`: This file contains code to produce Figure 2 and Figure 5.
-- `Plot7DayIncidence_MuSPADavail.R`: This file contains code to produce Figure 3 and Figure Figure 7.
+- `NumberOfInfections/NumberOfInfections_MuSPADavail.R`: This file contains code to produce Figure 2.
+- `NumberOfInfections/NumberOfInfectionsNoCI_MuSPADavail.R`: This file contains code to produce Figure 5.
+- `Plot7DayIncidence_MuSPADavail.R`: This file contains code to produce Figure 3 and Figure S1.
 - `VaccinationComparisons/VaccinationComparisonsNo8099_MuSPADavail.R`: This file contains code to produce Figure 4.
+- `VaccinationComparisons/VaccinationComparisons_MuSPADavail.R`: This file contains code to produce Figure S5.
 - `VaccinationComparisons/VaccinationComparisons_MuSPADavail.R`: This file contains code to produce Figure S4.
 - `DemographicComparison/DemographicComparison_MuSPADavail.R`: This file contains code to produce Figure 6.
-- `DemographicComparison/DemographicComparisonVaccNoVaccNA.R`: This file contains code to produce Figure S7.
-- `Supplementary/TimingOfInfection_MuSPADavail.R`: This file contains code to produce Figure S1.
-- `DemographicComparison/DemographicComparison_Recruiter.R`: This file contains code to produce Figure S2 and S3.
+- `Supplementary/TimingOfInfection_MuSPADavail.R`: This file contains code to produce Figure S2.
+- `DemographicComparison/DemographicComparison_Recruiter.R`: This file contains code to produce Figure S3 and S4.
 
 If you do _not_ have access to the MuSPAD data, you may run the following scripts:
 
@@ -36,6 +37,9 @@ If you do _not_ have access to the MuSPAD data, you may run the following script
 - `DemographicComparison/DemographicComparison_MuSPADunavail.R`: This file contains code to produce Figure 6 (minus the MuSPAD data).
 - `Supplementary/TimingOfInfection_MuSPADunavail.R`: This file contains code to produce Figure S1 (minus the MuSPAD data).
 - `DemographicComparison/DemographicComparison_Recruiter.R`: This file contains code to produce Figure S2 and S3.
+- `Supplementary/ParticipantFlow.R`: This file contains code to produce Figure S6.
+- `Supplementary/UnvaccReweighting.R`: This file contains code to produce Figure S7.
+- `Supplementary/DemographicComparisonVaccNoVaccNA.R`: This file contains code to produce Figure S8.
 
 ### Instructions to reproduce the plots
 

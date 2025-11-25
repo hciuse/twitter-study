@@ -5,6 +5,7 @@ library(readxl)
 library(lme4)
 library(boot)
 library(here)
+library(ggpattern)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
@@ -120,9 +121,8 @@ plot_data <- bind_rows(
 
 # Create plot with mixed model uncertainty bands
 glm_plot <- plot_data %>%
-  ggplot(aes(num_c19_infs_eng, percent)) +
-  geom_bar(
-    aes(fill = factor(
+  mutate(
+    recruiter = factor(
       recruiter,
       levels = c(
         "Recruiter 1 (Twitter)",
@@ -132,38 +132,51 @@ glm_plot <- plot_data %>%
         "Recruiter 5",
         "Recruiter 1 (Mastodon)"
       )
-    )),
+    ),
+    bar_color = palette_recruiters_bars()[as.numeric(recruiter)],
+    errorbar_color = palette_recruiters_errorbars()[as.numeric(recruiter)]
+  ) %>%
+  ggplot(aes(num_c19_infs_eng, percent)) +
+  geom_bar(
     stat = "identity",
-    position = "dodge",
-    width = 0.8
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    aes(color = bar_color, group = recruiter),
+    linewidth = 0.5
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = recruiter, group = recruiter),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.003
   ) +
   geom_errorbar(
     aes(
       x = num_c19_infs_eng,
       ymin = lci,
       ymax = uci,
-      colour = factor(
-        recruiter,
-        levels = c(
-          "Recruiter 1 (Twitter)",
-          "Recruiter 2",
-          "Recruiter 3",
-          "Recruiter 4",
-          "Recruiter 5",
-          "Recruiter 1 (Mastodon)"
-        )
-      )
+      color = errorbar_color,
+      group = recruiter
     ),
-    position = position_dodge(0.8),
+    position = position_dodge(width = 0.99),
     width = 0.3,
     alpha = 0.9,
-    size = 1.3
+    size = 1,
+    show.legend = FALSE
   ) +
+  
+  scale_pattern_fill_manual(values = palette_recruiters_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
   ylab("Share (Percentage)") +
   xlab("Number of Infections (Estimated)") +
-  scale_fill_manual(values = palette_recruiters_bars()) +
-  scale_color_manual(values = palette_recruiters_errorbars()) +
   scale_y_continuous(
     labels = scales::label_percent(scale = 1, accuracy = 0.5),
     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)

@@ -4,6 +4,7 @@ library(cowplot)
 library(ggpubr)
 library(readxl)
 library(here)
+library(ggpattern)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
@@ -58,22 +59,53 @@ GenderDataMuspad$percent <- as.double(GenderDataMuspad$percent)
 
 # Creation of plot
 GenderPlot <- GenderData %>% count(gender) %>% mutate(percent = 100 * n / sum(n), sum = sum(n)) %>% mutate(Source = "External Survey") %>% 
-                  rbind(GenderDataStatBundesamt) %>%
-                  rbind(GenderDataMuspad) %>%
-                    mutate(lci = sum*(n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-                    mutate(lci = 100/sum*lci) %>%
-                    mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
-                    mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-                    mutate(uci = 100/sum*uci) %>%
-ggplot(aes(gender, percent)) +
-  geom_bar(aes(fill=factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
-    geom_errorbar(aes(x=gender, ymin=lci, ymax=uci, colour = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, size=1.3) +
+  rbind(GenderDataStatBundesamt) %>%
+  rbind(GenderDataMuspad) %>%
+  mutate(lci = sum*(n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
+  mutate(lci = 100/sum*lci) %>%
+  mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
+  mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
+  mutate(uci = 100/sum*uci) %>%
+  mutate(
+    Source = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD")),
+    bar_color = palette_surveyfedmuspad_bars()[as.numeric(Source)],
+    errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(Source)]
+  ) %>%
+  ggplot(aes(gender, percent)) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.95),
+    fill = NA,
+    aes(color = bar_color, group = Source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.95),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = Source, group = Source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  geom_errorbar(
+    aes(x = gender, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
+    position = position_dodge(width = 0.95), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
   theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   ylab("Share (Percentage)") +
   xlab("Gender") +
-  scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
-  scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -132,24 +164,55 @@ AgeDataMuspad$age_bracket <- factor(AgeDataMuspad$age_bracket, levels = c("18-39
 
 # Creation of plot
 AgePlot <- AgeData %>% filter(!is.na(age_bracket)) %>% count(age_bracket) %>% 
-            mutate(percent = 100 * n / sum(n), sum = sum(n)) %>% 
-            mutate(source = "External Survey") %>%
-            rbind(AgeDataStatBundesamt) %>%
-            rbind(AgeDataMuspad) %>%
-            mutate(lci = sum*(n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-                    mutate(lci = 100/sum*lci) %>%
-                    mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
-                    mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
-                    mutate(uci = 100/sum*uci) %>%
-ggplot(aes(age_bracket, percent)) +
-  geom_bar(aes(fill=factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
-  geom_errorbar(aes(x=age_bracket, ymin=lci, ymax=uci, colour = factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, size=1.3) +
-  scale_color_manual(values = palette_surveyfedmuspad_errorbars())+
+  mutate(percent = 100 * n / sum(n), sum = sum(n)) %>% 
+  mutate(source = "External Survey") %>%
+  rbind(AgeDataStatBundesamt) %>%
+  rbind(AgeDataMuspad) %>%
+  mutate(lci = sum*(n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
+  mutate(lci = 100/sum*lci) %>%
+  mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
+  mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
+  mutate(uci = 100/sum*uci) %>%
+  mutate(
+    source = factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD")),
+    bar_color = palette_surveyfedmuspad_bars()[as.numeric(source)],
+    errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(source)]
+  ) %>%
+  ggplot(aes(age_bracket, percent)) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.97),
+    fill = NA,
+    aes(color = bar_color, group = source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.97),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = source, group = source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  geom_errorbar(
+    aes(x = age_bracket, ymin = lci, ymax = uci, color = errorbar_color, group = source),
+    position = position_dodge(width = 0.97), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
-    theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
+  theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   ylab("Share (Percentage)") +
   xlab("Age Bracket") +
-  scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -255,15 +318,47 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
                     mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
                     mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
                     mutate(uci = 100/sum*uci) %>%
+  mutate(
+    Source = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD")),
+    bar_color = palette_surveyfedmuspad_bars()[as.numeric(Source)],
+    errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(Source)]
+  ) %>%
  ggplot(aes(value, percent)) +
-  geom_bar(aes(fill=factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha=0.8) +
-  geom_errorbar(aes(x=value, ymin=lci, ymax=uci, colour = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, alpha=0.9, size=1.3) +
+  #geom_bar(aes(fill=factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha=0.8) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    aes(color = bar_color, group = Source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = Source, group = Source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  #geom_errorbar(aes(x=value, ymin=lci, ymax=uci, colour = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(width = 0.95), width = 0.3, alpha=0.9, size=1.3) +
+  geom_errorbar(
+    aes(x = value, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
+    position = position_dodge(width = 0.99), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_color_identity() +
   theme_minimal() +
   theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   ylab("Share (Percentage)") +
   xlab("Household size [# Members]") +
-  scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
-  scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -329,17 +424,48 @@ ChildrenPlot <- Children %>% filter(!is.na(total_hsld_size_persons_under_14)) %>
                     mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
                     mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
                     mutate(uci = 100/sum*uci) %>%
+  mutate(
+    Source = factor(Source, levels = c("External Survey", "MuSPAD")),
+    bar_color = palette_surveymuspad_bars()[as.numeric(Source)],
+    errorbar_color = palette_surveymuspad_errorbars()[as.numeric(Source)]
+  ) %>%
 ggplot(aes(total_hsld_size_persons_under_14, percent)) +
-  geom_bar(aes(fill=factor(Source, levels = c("External Survey", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
-  geom_errorbar(aes(x=total_hsld_size_persons_under_14, ymin=lci, ymax=uci, colour = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, alpha=0.9, size=1.3) +
+  #geom_bar(aes(fill=factor(Source, levels = c("External Survey", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.95),
+    fill = NA,
+    aes(color = bar_color, group = Source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.95),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = Source, group = Source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  geom_errorbar(
+    aes(x = total_hsld_size_persons_under_14, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
+    position = position_dodge(width = 0.95), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  #geom_errorbar(aes(x=total_hsld_size_persons_under_14, ymin=lci, ymax=uci, colour = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(width = 0.95), width = 0.3, alpha=0.9, size=1.3) +
   theme_minimal() +
   theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   #facet_wrap(~name, nrow=2) +
   #ylab("") +
   ylab("Share (Percentage)") +
   xlab("Children Under 14") +
-  scale_fill_manual(values = palette_surveymuspad_bars()) +
-  scale_color_manual(values=palette_surveymuspad_errorbars()) +
+  scale_pattern_fill_manual(values = palette_surveymuspad_bars()) +
+  scale_color_identity() +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -414,17 +540,48 @@ EducationPlot <- educationLevel %>% filter(!is.na(highest_educational_qualificat
                     mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
                     mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
                     mutate(uci = 100/sum*uci) %>%
+  mutate(
+    source = factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD")),
+    bar_color = palette_surveyfedmuspad_bars()[as.numeric(source)],
+    errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(source)]
+  ) %>%
 ggplot(aes(highest_educational_qualification, percent)) +
-  geom_bar(aes(fill=factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
-      geom_errorbar(aes(x=highest_educational_qualification, ymin=lci, ymax=uci, colour = factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, size=1.3) +
+  #geom_bar(aes(fill=factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.97),
+    fill = NA,
+    aes(color = bar_color, group = source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.97),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = source, group = source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  geom_errorbar(
+    aes(x = highest_educational_qualification, ymin = lci, ymax = uci, color = errorbar_color, group = source),
+    position = position_dodge(width = 0.97), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  #geom_errorbar(aes(x=highest_educational_qualification, ymin=lci, ymax=uci, colour = factor(source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD"))), position = position_dodge(width = 0.95), width = 0.3, size=1.3) +
   theme_minimal() +
   theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   #facet_wrap(~name, nrow=2) +
   #ylab("") +
   ylab("Share (Percentage)") +
   xlab("Education") +
-  scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
-  scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
+  scale_pattern_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_color_identity() +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -518,16 +675,48 @@ OccupationPlot <- currentOccupation %>% filter(!is.na(current_occupation)) %>%
                     mutate(lci = case_when(lci < 0 ~ 0, .default= lci)) %>%
                     mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
                     mutate(uci = 100/sum*uci) %>%
+  mutate(
+    source = factor(source, levels = c("External Survey", "Federal Employment Agency", "MuSPAD")),
+    bar_color = palette_surveyfedmuspad_bars()[as.numeric(source)],
+    errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(source)]
+  ) %>%
 ggplot(aes(current_occupation, percent)) +
-  geom_bar(aes(fill=factor(source, levels = c("External Survey", "Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
-  geom_errorbar(aes(x=current_occupation, ymin=lci, ymax=uci, colour = factor(source, levels = c("External Survey", "Federal Employment Agency", "MuSPAD"))), position = position_dodge(0.8), width = 0.3, size=1.3) +
-  scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
+  #geom_bar(aes(fill=factor(source, levels = c("External Survey", "Federal Employment Agency", "MuSPAD"))), stat = "identity", position = "dodge", width = 0.8, alpha = 0.8) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    aes(color = bar_color, group = source),
+    linewidth = 1
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge(width = 0.99),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = source, group = source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+     pattern_spacing = 0.01
+  ) +
+  geom_errorbar(
+    aes(x = current_occupation, ymin = lci, ymax = uci, color = errorbar_color, group = source),
+    position = position_dodge(width = 0.99), 
+    width = 0.3,
+    size = 1.3,
+    show.legend = FALSE
+  ) +
+  #geom_errorbar(aes(x=current_occupation, ymin=lci, ymax=uci, colour = factor(source, levels = c("External Survey", "Federal Employment Agency", "MuSPAD"))), position = position_dodge(width = 0.95), width = 0.3, size=1.3) +
+  #scale_color_manual(values = palette_surveyfedmuspad_errorbars()) +
   theme_minimal() +
   theme(plot.margin=unit(c(1,1,1,1), 'cm')) +
   #facet_wrap(~name, nrow=2) +
   ylab("Share (Percentage)") +
   xlab("Current Occupation") +
-  scale_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_pattern_fill_manual(values = palette_surveyfedmuspad_bars()) +
+  scale_color_identity() +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 1), breaks = c(0,25, 50,75,100)) +
   theme(text = element_text(size = 50)) +
   theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +

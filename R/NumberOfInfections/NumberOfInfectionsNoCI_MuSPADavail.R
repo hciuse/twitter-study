@@ -3,6 +3,7 @@ library(RColorBrewer)
 library(ggpubr)
 library(readxl)
 library(here)
+library(ggpattern)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
@@ -111,17 +112,35 @@ upper_panel <- ext_survey_df %>%
   rbind(InfectionsDataMuspad) %>%
   rbind(InfectionsDataCOSMO) %>%
   rbind(InfectionsDataMastodon) %>%
-  mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO"))) %>%
+  mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO")),
+         # Create manual color columns
+         bar_color = palette_twittermastodonsurvey_bars()[as.numeric(Source)],
+         errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)]) %>%
   ggplot(aes(num_c19_infs_eng, percent, fill = Source)) +
-  geom_bar(stat = "identity", position = "dodge2", width = 0.85) +
+  geom_bar(stat = "identity", position = position_dodge2(width = 0.85),
+           fill = NA,
+           aes(color = bar_color),
+           linewidth = 1) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.85),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = Source),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.02,
+  ) +
   theme_minimal() +
   facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
   theme(panel.spacing = unit(1, "cm")) +
   ylab("Share (Percentage)") +
   ggtitle("Number of Infections") +
   xlab("") +
-  scale_fill_manual(values = palette_twittermastodonsurvey_bars()) +
-  scale_color_manual(values = palette_twittermastodonsurvey_errorbars()) +
+  scale_pattern_fill_manual(values = palette_twittermastodonsurvey_bars()) +
+  scale_color_identity() +
   scale_y_continuous(
     labels = scales::label_percent(scale = 1, accuracy = 0.5),
     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
@@ -197,15 +216,39 @@ InfectionsDataTwitter$percent <- 100*(InfectionsDataTwitter$percent)
 InfectionsDataTwitter$sum <- as.double(InfectionsDataTwitter$sum)
 
 # Creation of plot
-no_ci_plot <- InfectionsDataTwitter %>% group_by(recruiter) %>%
+no_ci_plot <- InfectionsDataTwitter %>% 
+  mutate(
+    recruiter = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)")),
+    bar_color = palette_recruiters_bars()[as.numeric(recruiter)]
+  ) %>%
+  group_by(recruiter) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
-  geom_bar(aes(fill=factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)"))), stat = "identity", position = "dodge", width = 0.8) +
+  geom_bar(
+    stat = "identity",
+    position = position_dodge2(width = 0.8, preserve = "single"),
+    fill = NA,
+    aes(color = bar_color, group = recruiter),
+    linewidth = 0.5
+  ) +
+  geom_bar_pattern(
+    stat = "identity",
+    position = position_dodge2(width = 0.8, preserve = "single"),
+    fill = NA,
+    color = NA,
+    aes(pattern_fill = recruiter, group = recruiter),
+    pattern = "stripe",
+    pattern_colour = NA,
+    pattern_angle = 45,
+    pattern_density = 0.4,
+    pattern_spacing = 0.003
+  ) +
+  
+  scale_pattern_fill_manual(values = palette_recruiters_bars()) +
+  scale_color_identity() +
+  
   theme_minimal() +
-  #facet_wrap(~name, nrow=2) +
   ylab("Share (Percentage)") +
   xlab("Number of Infections (Raw)") +
-  scale_fill_manual(values = palette_recruiters_bars()) +
-  scale_color_manual(values = palette_recruiters_errorbars()) +
   scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25, 37.5, 50,75,100)) +
   theme(text = element_text(size = 33)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -214,10 +257,14 @@ no_ci_plot <- InfectionsDataTwitter %>% group_by(recruiter) %>%
         axis.ticks.length = unit(5, "pt"),
         plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill = "white")) +
-  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+  guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
 ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.pdf", dpi = 500, w = 10, h = 7.5)
 ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.png", dpi = 500,  w = 10, h = 7.5)
+
+if (!exists("glm_plot")) {
+  source(here("R", "NumberOfInfections", "NumberOfInfectionsGLM_MuSPADavail.R"))
+}
 
 ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom")
 ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI_GLM.pdf", dpi = 500, w = 20, h = 7.5)
