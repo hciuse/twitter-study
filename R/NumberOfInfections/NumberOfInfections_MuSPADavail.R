@@ -90,7 +90,7 @@ InfectionsDataCOSMO$sum <- as.double(InfectionsDataCOSMO$sum)
 
 facet_labels <- c(
   "Twitter" = "Twitter\n(N=4217)",
-  "Mastodon" = "Mastodon\n(N=1764)",
+  "Mastodon" = "Mastodon\n(N=1765)",
   "External Survey" = "External survey\n(N=866)",
   "MuSPAD" = "MuSPAD\n(N=4997)",
   "COSMO" = "COSMO\n(N=1003)"
@@ -114,7 +114,8 @@ upper_panel <- ext_survey_df %>%
     Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO")),
     # Create manual color columns
     bar_color = palette_twittermastodonsurvey_bars()[as.numeric(Source)],
-    errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)]
+    errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)],
+    label = paste0(sprintf("%.1f%%", percent), "\n(", n, "/", as.integer(sum), ")")
   ) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +  
   
@@ -146,6 +147,13 @@ upper_panel <- ext_survey_df %>%
     linewidth = 2
   ) +
   
+  geom_text(
+    aes(label = label, y = uci),
+    vjust = -0.3,
+    size = 7,
+    lineheight = 0.9
+  ) +
+  
   facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
   theme_minimal() +
   ylab("Share (%)") +
@@ -157,7 +165,8 @@ upper_panel <- ext_survey_df %>%
   
   scale_y_continuous(
     labels = function(x) ifelse(x == floor(x), as.integer(x), x),
-    breaks = c(0,12.5,25,37.5,50,75,100)
+    breaks = c(0,12.5,25,37.5,50,75,100),
+    expand = expansion(mult = c(0, 0.1))
   ) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   
