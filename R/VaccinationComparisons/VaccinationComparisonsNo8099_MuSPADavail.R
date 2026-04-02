@@ -16,7 +16,7 @@ source(here("R", "MuSPADPreprocessing.R"))
 
 # Procession of external survey data
 vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
-vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 60 ~ "60+",
+vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 60 ~ "≥60",
                                                                     2023-year_of_birth >= 40 ~ "40-59",
                                                                     2023-year_of_birth >= 18 ~ "18-39"
 )) %>%
@@ -60,23 +60,23 @@ vaccinationData$dose_4_received<- factor(vaccinationData$dose_4_received, levels
 
 vaccinationData <- vaccinationData %>% group_by(agegroup) %>% pivot_longer(cols=c(dose_1_received, dose_2_received, dose_3_received, dose_4_received)) %>%
   filter(value %in% c("Yes", "Not Vaccinated")) %>% 
-  mutate(Source = "External Survey") %>%
+  mutate(Source = "External survey") %>%
   mutate(name = case_when(name == "dose_1_received" ~ "Received at\nleast 1 dose",
                           name == "dose_2_received" ~ "Received at\nleast 2 doses",
                           name == "dose_3_received" ~ "Received at\nleast 3 doses",
-                          name == "dose_4_received" ~ "Received at\nleast 4 doses")) %>% count(name) %>% mutate(Source = "External Survey") 
+                          name == "dose_4_received" ~ "Received at\nleast 4 doses")) %>% count(name) %>% mutate(Source = "External survey") 
 NotVacc <- data.frame(matrix(nrow = 0, ncol = 4))
 colnames(NotVacc) <- c("name", "n", "Source", "agegroup")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External Survey", "18-39")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 8, "External Survey", "40-59")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External Survey", "60+")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External survey", "18-39")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 8, "External survey", "40-59")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External survey", "≥60")
 NotVacc$n <- as.double(NotVacc$n)                                                              
 
 vaccinationData <- rbind(vaccinationData, NotVacc)
 vaccinationData <- vaccinationData %>% filter(!is.na(agegroup)) %>% 
   mutate(groupsize = case_when(agegroup == "18-39" ~ 105+1,
                                agegroup == "40-59" ~ 351+8,
-                               agegroup == "60+"  ~ 88+1+2)) %>%
+                               agegroup == "≥60"  ~ 88+1+2)) %>%
   group_by(agegroup, name) %>% mutate(percent = n/groupsize) %>% select(n, name, percent, Source, agegroup, groupsize)
 
 # Procession of RKI data
@@ -89,11 +89,11 @@ RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_18b
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_18bis59_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_18bis59_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_18bis59_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received 0 doses", 100-Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_60plus_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_60plus_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_60plus_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received 0 doses", 100-Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_60plus_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_60plus_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_60plus_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
 RkiVacc$percent <- as.double(RkiVacc$percent)
 RkiVacc$percent <- RkiVacc$percent/100
 RkiVacc$groupsize <- as.double(RkiVacc$groupsize)
@@ -221,10 +221,10 @@ survey_doses <- ggplot(
     legend.background = element_rect("white")
   ) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("External Survey (N = 554)") +
+  ylab("Share (%)") +
+  ggtitle("External survey (N=554)") +
   theme(text = element_text(size = 50)) +
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::label_percent(suffix = "")) +
   theme(
     axis.ticks.x = element_line(),
     axis.ticks.y = element_line(),
@@ -296,9 +296,9 @@ rki_doses <- ggplot(RkiVacc %>%
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("RKI (Population)") + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+  ylab("Share (%)") +
+  ggtitle("RKI (population)") + 
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), limits = c(0,1)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
@@ -367,18 +367,34 @@ muspad_doses <- ggplot(MuSPADVacc %>%
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("MuSPAD study (N = 4037)") + 
-  scale_y_continuous(labels = scales::percent) +
+  ylab("Share (%)") +
+  ggtitle("MuSPAD study (N=4037)") + 
+  scale_y_continuous(labels = scales::label_percent(suffix = "")) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill = "white"))
+
 # Layout and save plots
-ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))
+ggsave(
+  here("plots", "NoVaccinations_Comparison_No8099.png"),
+  ggarrange(
+    survey_doses,
+    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
+    muspad_doses,
+    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
+    rki_doses,
+    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
+    timelineplot2,
+    ncol = 1, nrow = 7,
+    labels = c("A", "", "", "", "", "", "B"),
+    font.label = list(size = 37),
+    heights = c(1, 0.05, 1, 0.05, 1, 0.05, 0.5),
+    widths = c(1, 1, 1, 1, 1, 1, 1)
+  ),
+  dpi = 500, w = 24, h = 36
+)
 
 ggsave(here("plots", "NoVaccinations_Comparison_No8099.pdf"), dpi = 500, w = 24, h = 36)
-
-ggsave(here("plots", "NoVaccinations_Comparison_No8099.png"), dpi = 500, w = 24, h = 36)

@@ -175,12 +175,13 @@ glm_plot <- plot_data %>%
   scale_color_identity() +
   
   theme_minimal() +
-  ylab("Share (Percentage)") +
-  xlab("Number of Infections (Estimated)") +
+  ylab("Share (%)") +
+  xlab("Number of infections (estimated)") +
   scale_y_continuous(
-    labels = scales::label_percent(scale = 1, accuracy = 0.5),
+    labels = function(x) ifelse(x == floor(x), as.integer(x), x),
     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
   ) +
+  scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(
