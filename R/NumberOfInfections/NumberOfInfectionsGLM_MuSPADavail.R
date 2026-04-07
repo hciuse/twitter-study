@@ -134,7 +134,8 @@ glm_plot <- plot_data %>%
       )
     ),
     bar_color = palette_recruiters_bars()[as.numeric(recruiter)],
-    errorbar_color = palette_recruiters_errorbars()[as.numeric(recruiter)]
+    errorbar_color = palette_recruiters_errorbars()[as.numeric(recruiter)],
+    label = sprintf("%.1f%%", percent)
   ) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(
@@ -170,6 +171,13 @@ glm_plot <- plot_data %>%
     size = 1,
     show.legend = FALSE
   ) +
+  geom_text(
+    aes(label = label, y = uci, group = recruiter),
+    position = position_dodge(width = 0.99),
+    vjust = -0.3,
+    size = 3,
+    lineheight = 0.9
+  ) +
   
   scale_pattern_fill_manual(values = palette_recruiters_bars()) +
   scale_color_identity() +
@@ -179,7 +187,8 @@ glm_plot <- plot_data %>%
   xlab("Number of infections (estimated)") +
   scale_y_continuous(
     labels = function(x) ifelse(x == floor(x), as.integer(x), x),
-    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
+    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100),
+    expand = expansion(mult = c(0, 0.15))
   ) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
@@ -193,8 +202,8 @@ glm_plot <- plot_data %>%
   ) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5)
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 10, h = 7.5)
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 10, h = 7.5, bg = "white")
 
 # Print model summaries
 cat("\n=== Model Summary for '0 infections' ===\n")
