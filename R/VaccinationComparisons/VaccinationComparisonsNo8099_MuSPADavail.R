@@ -113,7 +113,7 @@ MuSPADVacc <- MuSPADVacc %>% mutate(s23_vacc_type_1 = case_when(s23_vacc_type_1 
   mutate(s23_vacc_type_4 = case_when(s23_vacc_type_4 %in% c("Moderna", "BioNTech", "AstraZeneca", "Janssen/ Johnson & Johnson", "Novavax") ~ "Yes",
                                      s23_vacc_type_4 == NA ~ NA,
                                      s23_vacc_type_4 == "keine (weitere) Impfung erhalten" ~ "No")) %>%
-  mutate(agegroup = case_when(2023-s22_birth_date_yyyy >= 80 ~ "80-99",
+  mutate(agegroup = case_when(2023-s22_birth_date_yyyy >= 80 ~ "≥80",
                               2023-s22_birth_date_yyyy >= 60 ~ "60-79",
                               2023-s22_birth_date_yyyy >= 40 ~ "40-59",
                               2023-s22_birth_date_yyyy >= 18 ~ "18-39"
@@ -134,7 +134,7 @@ colnames(NotVacc) <- c("name", "n", "Source", "agegroup")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 30, "MuSPAD", "18-39")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 80, "MuSPAD", "40-59")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 68 , "MuSPAD", "60-79")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD", "80-99") ##Use c19_vaccination_status to find unvaccinated
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD", "≥80") ##Use c19_vaccination_status to find unvaccinated
 NotVacc$n <- as.double(NotVacc$n)                                                              
 
 MuSPADVacc <- rbind(MuSPADVacc, NotVacc)
@@ -143,7 +143,7 @@ MuSPADVacc <- MuSPADVacc %>%
   mutate(groupsize = case_when(agegroup == "18-39" ~ 639 + 30,
                                agegroup == "40-59" ~ 1403 + 80,
                                agegroup == "60-79" ~ 1678 + 68,
-                               agegroup == "80-99" ~ 133+6)) %>%
+                               agegroup == "≥80" ~ 133+6)) %>%
   group_by(agegroup, name) %>%
   mutate(percent = n/groupsize)
 MuSPADVacc$percent <- as.double(MuSPADVacc$percent)
@@ -171,7 +171,7 @@ survey_doses <- ggplot(
     mutate(uci = uci / groupsize) %>%
     mutate(uci = case_when(uci > 1 ~ 1, .default = uci)) %>%
     mutate(
-      agegroup = factor(agegroup),  # Ensure it's a factor
+      agegroup = factor(agegroup, levels = c("18-39", "40-59", "≥60")),
       bar_color = palette_survey_bars()[as.numeric(agegroup)],
       errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)],
       label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "/", as.integer(groupsize), ")")
@@ -258,7 +258,7 @@ rki_doses <- ggplot(RkiVacc %>%
                       mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
                       mutate(uci = uci/groupsize) %>%
                       mutate(
-                        agegroup = factor(agegroup),
+                        agegroup = factor(agegroup, levels = c("18-59", "≥60")),
                         bar_color = palette_rki_bars()[as.numeric(agegroup)],
                         errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)],
                         label = sprintf("%.1f%%", percent * 100)
@@ -337,10 +337,10 @@ muspad_doses <- ggplot(MuSPADVacc %>%
                          mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
                          mutate(uci = uci/groupsize) %>%
                          mutate(
-                           agegroup = factor(agegroup),
+                           agegroup = factor(agegroup, levels = c("18-39", "40-59", "60-79", "≥80")),
                            bar_color = palette_muspad_bars()[as.numeric(agegroup)],
                            errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)],
-                           label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "/\n", as.integer(groupsize), ")")
+                           label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "\n/", as.integer(groupsize), ")")
                          ),
                        aes(x = name,  y = percent)) +
   geom_bar(
@@ -402,11 +402,11 @@ muspad_doses <- ggplot(MuSPADVacc %>%
 ggsave(
   here("plots", "NoVaccinations_Comparison_No8099.pdf"),
   ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
-  dpi = 500, w = 24, h = 36, bg = "white"
+  dpi = 500, w = 28, h = 36, bg = "white"
 )
 
 ggsave(
   here("plots", "NoVaccinations_Comparison_No8099.png"),
   ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
-  dpi = 500, w = 24, h = 36, bg = "white"
+  dpi = 500, w = 28, h = 36, bg = "white"
 )
