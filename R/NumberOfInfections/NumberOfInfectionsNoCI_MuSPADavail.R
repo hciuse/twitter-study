@@ -115,7 +115,7 @@ upper_panel <- ext_survey_df %>%
   mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO")),
          bar_color = palette_twittermastodonsurvey_bars()[as.numeric(Source)],
          errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)],
-         label = paste0(sprintf("%.1f%%", percent), "\n(", n, "/", as.integer(sum), ")")) %>%
+         label = paste0(sprintf("%.1f%%", percent), " (", n, "/", as.integer(sum), ")")) %>%
   ggplot(aes(num_c19_infs_eng, percent, fill = Source)) +
   geom_bar(stat = "identity", position = position_dodge2(width = 0.85),
            fill = NA,
@@ -135,9 +135,9 @@ upper_panel <- ext_survey_df %>%
   ) +
   geom_text(
     aes(label = label, y = percent),
-    vjust = -0.3,
-    size = 7,
-    lineheight = 0.9
+    angle = 90,
+    hjust = -0.1,
+    size = 8
   ) +
   theme_minimal() +
   facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
@@ -150,7 +150,7 @@ upper_panel <- ext_survey_df %>%
   scale_y_continuous(
     labels = function(x) ifelse(x == floor(x), as.integer(x), x),
     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100),
-    expand = expansion(mult = c(0, 0.15))
+    expand = expansion(mult = c(0, 0.4))
   ) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(
@@ -169,12 +169,12 @@ upper_panel <- ext_survey_df %>%
 ggsave(
   here("plots", "NoInfections_Comparison_NoCI.pdf"),
   ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5)),
-  dpi = 500, w = 24, h = 18, bg = "white"
+  dpi = 500, w = 24, h = 22, bg = "white"
 )
 ggsave(
   here("plots", "NoInfections_Comparison_NoCI.png"),
   ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5)),
-  dpi = 500, w = 24, h = 18, bg = "white"
+  dpi = 500, w = 24, h = 22, bg = "white"
 )
 
 # Number of infections (by recruiter) ----------------------------------------------------
@@ -234,7 +234,7 @@ no_ci_plot <- InfectionsDataTwitter %>%
   mutate(
     recruiter = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)")),
     bar_color = palette_recruiters_bars()[as.numeric(recruiter)],
-    label = paste0(sprintf("%.1f%%", percent), "\n(", as.integer(n), "/\n", as.integer(sum), ")")
+    label = paste0(sprintf("%.1f%%", percent), " (", as.integer(n), "/", as.integer(sum), ")")
   ) %>%
   group_by(recruiter) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
@@ -263,14 +263,14 @@ no_ci_plot <- InfectionsDataTwitter %>%
   geom_text(
     aes(label = label, y = percent, group = recruiter),
     position = position_dodge(width = 0.99),
-    vjust = -0.3,
-    size = 3,
-    lineheight = 0.9
+    angle = 90,
+    hjust = -0.1,
+    size = 7
   ) +
   theme_minimal() +
   ylab("Share (%)") +
   xlab("Number of infections (raw)") +
-  scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100), expand = expansion(mult = c(0, 0.2))) +
+  scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
@@ -281,20 +281,25 @@ no_ci_plot <- InfectionsDataTwitter %>%
         panel.background = element_rect(fill = "white")) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.pdf"), dpi = 500, w = 10, h = 7.5, bg = "white")
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.png"), dpi = 500,  w = 10, h = 7.5, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.pdf"), dpi = 500, w = 12, h = 10, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.png"), dpi = 500, w = 12, h = 10, bg = "white")
 
 if (!exists("glm_plot")) {
-  source(here("R", "NumberOfInfections", "NumberOfInfectionsGLM_MuSPADavail.R"))
+  cache_path <- here("data", "glm_plot_cache.rds")
+  if (file.exists(cache_path)) {
+    glm_plot <- readRDS(cache_path)
+  } else {
+    source(here("R", "NumberOfInfections", "NumberOfInfectionsGLM_MuSPADavail.R"))
+  }
 }
 
 ggsave(
   here("plots", "NoInfections_Comparison_Recruiter_NoCI_GLM.pdf"),
   ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom"),
-  dpi = 500, w = 20, h = 7.5, bg = "white"
+  dpi = 500, w = 20, h = 10, bg = "white"
 )
 ggsave(
   here("plots", "NoInfections_Comparison_Recruiter_NoCI_GLM.png"),
   ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom"),
-  dpi = 500, w = 20, h = 7.5, bg = "white"
+  dpi = 500, w = 20, h = 10, bg = "white"
 )

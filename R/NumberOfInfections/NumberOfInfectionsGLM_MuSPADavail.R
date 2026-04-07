@@ -174,9 +174,9 @@ glm_plot <- plot_data %>%
   geom_text(
     aes(label = label, y = uci, group = recruiter),
     position = position_dodge(width = 0.99),
-    vjust = -0.3,
-    size = 3,
-    lineheight = 0.9
+    angle = 90,
+    hjust = -0.1,
+    size = 7
   ) +
   
   scale_pattern_fill_manual(values = palette_recruiters_bars()) +
@@ -188,7 +188,7 @@ glm_plot <- plot_data %>%
   scale_y_continuous(
     labels = function(x) ifelse(x == floor(x), as.integer(x), x),
     breaks = c(0, 12.5, 25, 37.5, 50, 75, 100),
-    expand = expansion(mult = c(0, 0.15))
+    expand = expansion(mult = c(0, 0.4))
   ) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
@@ -202,8 +202,10 @@ glm_plot <- plot_data %>%
   ) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5, bg = "white")
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 10, h = 7.5, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 12, h = 10, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 12, h = 10, bg = "white")
+
+saveRDS(glm_plot, here("data", "glm_plot_cache.rds"))
 
 # Print model summaries
 cat("\n=== Model Summary for '0 infections' ===\n")
