@@ -99,7 +99,7 @@ GenderPlot <- GenderData %>% count(gender) %>% mutate(percent = 100 * n / sum(n)
     aes(x = gender, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
     position = position_dodge(width = 0.95),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
@@ -217,7 +217,7 @@ AgePlot <- AgeData %>% filter(!is.na(age_bracket)) %>% count(age_bracket) %>%
     aes(x = age_bracket, ymin = lci, ymax = uci, color = errorbar_color, group = source),
     position = position_dodge(width = 0.97),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
@@ -374,7 +374,7 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
     aes(x = value, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
     position = position_dodge(width = 0.99),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
@@ -486,7 +486,7 @@ ChildrenPlot <- Children %>% filter(!is.na(total_hsld_size_persons_under_14)) %>
     aes(x = total_hsld_size_persons_under_14, ymin = lci, ymax = uci, color = errorbar_color, group = Source),
     position = position_dodge(width = 0.95),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
@@ -613,7 +613,7 @@ EducationPlot <- educationLevel %>% filter(!is.na(highest_educational_qualificat
     aes(x = highest_educational_qualification, ymin = lci, ymax = uci, color = errorbar_color, group = source),
     position = position_dodge(width = 0.97),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
@@ -759,7 +759,7 @@ OccupationPlot <- currentOccupation %>% filter(!is.na(current_occupation)) %>%
     aes(x = current_occupation, ymin = lci, ymax = uci, color = errorbar_color, group = source),
     position = position_dodge(width = 0.99),
     width = 0.3,
-    size = 1.3,
+    linewidth = 1.3,
     show.legend = FALSE
   ) +
   geom_text(
