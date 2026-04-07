@@ -156,6 +156,7 @@ palette_survey_bars <- function() {
 palette_survey_errorbars <- function() {
   c("#9900CC", "#730099", "#400155")
 }
+
 survey_doses <- ggplot(
   vaccinationData %>%
     filter(name != "Received 0 doses") %>%
@@ -171,8 +172,9 @@ survey_doses <- ggplot(
     mutate(uci = case_when(uci > 1 ~ 1, .default = uci)) %>%
     mutate(
       agegroup = factor(agegroup),  # Ensure it's a factor
-      bar_color = palette_survey_bars()[as.numeric(agegroup)], 
-      errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)]
+      bar_color = palette_survey_bars()[as.numeric(agegroup)],
+      errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)],
+      label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "/", as.integer(groupsize), ")")
     ),
   aes(x = name, y = percent)
 ) +
@@ -183,7 +185,6 @@ survey_doses <- ggplot(
     aes(color = bar_color, group = agegroup),
     linewidth = 1
   ) +
-  
   geom_bar_pattern(
     stat = "identity",
     position = position_dodge2(width = 0.9, preserve = "single"),
@@ -209,7 +210,13 @@ survey_doses <- ggplot(
     size = 2,
     show.legend = FALSE
   ) +
-  
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   scale_pattern_fill_manual(values = palette_survey_bars()) +
   scale_color_identity() +
   
@@ -224,7 +231,7 @@ survey_doses <- ggplot(
   ylab("Share (%)") +
   ggtitle("External survey (N=554)") +
   theme(text = element_text(size = 50)) +
-  scale_y_continuous(labels = scales::label_percent(suffix = "")) +
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), expand = expansion(mult = c(0, 0.15))) +
   theme(
     axis.ticks.x = element_line(),
     axis.ticks.y = element_line(),
@@ -253,8 +260,9 @@ rki_doses <- ggplot(RkiVacc %>%
                       mutate(
                         agegroup = factor(agegroup),
                         bar_color = palette_rki_bars()[as.numeric(agegroup)],
-                        errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)]
-                      ), 
+                        errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)],
+                        label = sprintf("%.1f%%", percent * 100)
+                      ),
                     aes(x = name,  y = percent)) +
   geom_bar(
     stat = "identity",
@@ -288,6 +296,13 @@ rki_doses <- ggplot(RkiVacc %>%
     size = 2,
     show.legend = FALSE
   ) +
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   
   scale_pattern_fill_manual(values = palette_rki_bars()) +
   scale_color_identity() +
@@ -298,7 +313,7 @@ rki_doses <- ggplot(RkiVacc %>%
   xlab("") +
   ylab("Share (%)") +
   ggtitle("RKI (population)") + 
-  scale_y_continuous(labels = scales::label_percent(suffix = ""), limits = c(0,1)) +
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), limits = c(0,1)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
@@ -324,8 +339,9 @@ muspad_doses <- ggplot(MuSPADVacc %>%
                          mutate(
                            agegroup = factor(agegroup),
                            bar_color = palette_muspad_bars()[as.numeric(agegroup)],
-                           errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)]
-                         ), 
+                           errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)],
+                           label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "/\n", as.integer(groupsize), ")")
+                         ),
                        aes(x = name,  y = percent)) +
   geom_bar(
     stat = "identity",
@@ -359,17 +375,22 @@ muspad_doses <- ggplot(MuSPADVacc %>%
     size = 2,
     show.legend = FALSE
   ) +
-  
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   scale_pattern_fill_manual(values = palette_muspad_bars()) +
   scale_color_identity() +
-  
   theme_minimal() +
   theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   xlab("") +
   ylab("Share (%)") +
-  ggtitle("MuSPAD study (N=4037)") + 
-  scale_y_continuous(labels = scales::label_percent(suffix = "")) +
+  ggtitle("MuSPAD study (N=4037)") +
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), expand = expansion(mult = c(0, 0.3))) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
@@ -379,22 +400,13 @@ muspad_doses <- ggplot(MuSPADVacc %>%
 
 # Layout and save plots
 ggsave(
-  here("plots", "NoVaccinations_Comparison_No8099.png"),
-  ggarrange(
-    survey_doses,
-    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
-    muspad_doses,
-    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
-    rki_doses,
-    ggparagraph(text = "   ", face = "italic", size = 14, color = "black"),
-    timelineplot2,
-    ncol = 1, nrow = 7,
-    labels = c("A", "", "", "", "", "", "B"),
-    font.label = list(size = 37),
-    heights = c(1, 0.05, 1, 0.05, 1, 0.05, 0.5),
-    widths = c(1, 1, 1, 1, 1, 1, 1)
-  ),
-  dpi = 500, w = 24, h = 36
+  here("plots", "NoVaccinations_Comparison_No8099.pdf"),
+  ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
+  dpi = 500, w = 24, h = 36, bg = "white"
 )
 
-ggsave(here("plots", "NoVaccinations_Comparison_No8099.pdf"), dpi = 500, w = 24, h = 36)
+ggsave(
+  here("plots", "NoVaccinations_Comparison_No8099.png"),
+  ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
+  dpi = 500, w = 24, h = 36, bg = "white"
+)
