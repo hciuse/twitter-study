@@ -340,6 +340,7 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
   mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
   mutate(uci = 100/sum*uci) %>%
   mutate(
+    value = factor(value, levels = c("1", "2", "3", "4", "≥5")),
     Source = factor(Source, levels = c("External Survey", "Federal Statistical Office, Federal Employment Agency", "MuSPAD")),
     bar_color = palette_surveyfedmuspad_bars()[as.numeric(Source)],
     errorbar_color = palette_surveyfedmuspad_errorbars()[as.numeric(Source)],
@@ -444,10 +445,11 @@ ChildrenDataMuspad$n <- as.integer(ChildrenDataMuspad$n)
 ChildrenDataMuspad$percent <- as.double(ChildrenDataMuspad$percent)
 
 # Creation of plot
-ChildrenPlot <- Children %>% filter(!is.na(total_hsld_size_persons_under_14)) %>% 
-  count(total_hsld_size_persons_under_14) %>% 
-  mutate(percent = 100 * n / sum(n), sum = sum(n)) %>% 
-  mutate(Source = "External Survey") %>% 
+ChildrenPlot <- Children %>% filter(!is.na(total_hsld_size_persons_under_14)) %>%
+  count(total_hsld_size_persons_under_14) %>%
+  mutate(percent = 100 * n / sum(n), sum = sum(n),
+         total_hsld_size_persons_under_14 = factor(total_hsld_size_persons_under_14, levels = c("0", "1", "2", "≥3"))) %>%
+  mutate(Source = "External Survey") %>%
   rbind(ChildrenDataMuspad) %>% 
   filter(!is.na(Source)) %>%
   mutate(lci = sum*(n/sum - 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
