@@ -246,16 +246,27 @@ InfectionsDataTwitter %>% group_by(recruiter) %>%
   mutate(lci = 100/sum*lci) %>%
   mutate(uci = sum*(n/sum + 1.96*(((n/sum*(1-n/sum))/sum)^0.5))) %>%
   mutate(uci = 100/sum*uci) %>%
+  mutate(
+    recruiter = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)")),
+    label = paste0(sprintf("%.1f%%", percent), "\n(", as.integer(n), "/\n", as.integer(sum), ")")
+  ) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
-  geom_bar(aes(fill=factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)"))), stat = "identity", position = "dodge", width = 0.8) +
-  geom_errorbar(aes(x=num_c19_infs_eng, ymin=lci, ymax=uci, colour = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)"))), position = position_dodge(0.8), width = 0.3, alpha=0.9, size=1.3) +
+  geom_bar(aes(fill = recruiter), stat = "identity", position = position_dodge2(width = 0.9, padding = 0.05)) +
+  geom_errorbar(aes(x = num_c19_infs_eng, ymin = lci, ymax = uci, colour = recruiter), position = position_dodge(width = 0.9), width = 0.3, alpha = 0.9, size = 1.3) +
+  geom_text(
+    aes(label = label, y = uci, group = recruiter),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 3,
+    lineheight = 0.9
+  ) +
   theme_minimal() +
   #facet_wrap(~name, nrow=2) +
   ylab("Share (%)") +
   xlab("Number of infections") +
   scale_fill_manual(values = palette_recruiters_bars()) +
   scale_color_manual(values = palette_recruiters_errorbars()) +
-  scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100)) +
+  scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100), expand = expansion(mult = c(0, 0.2))) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
