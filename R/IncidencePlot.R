@@ -317,12 +317,12 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
     ggsave(
       here("plots", paste0("VizComparisonIncidenceSurveyRKI_", age_group, "_bootstrapped_", bootstrapping, ".pdf")),
       ggarrange(ComSurveyRki, timelineplot2, labels = c("A", "B"), nrow = 2, ncol = 1,  align = "hv", font.label = list(size = 37), heights = c(1.1,0.22)),
-      dpi = 500, w = 25, h = 30, bg = "white"
+      dpi = 500, w = 28, h = 30, bg = "white"
     )
     ggsave(
       here("plots", paste0("VizComparisonIncidenceSurveyRKI_", age_group, "_bootstrapped_ ", bootstrapping, ".png")),
       ggarrange(ComSurveyRki, timelineplot2, labels = c("A", "B"), nrow = 2, ncol = 1,  align = "hv", font.label = list(size = 37), heights = c(1.1,0.22)),
-      dpi = 500, w = 25, h = 30, bg = "white"
+      dpi = 500, w = 28, h = 30, bg = "white"
     )
   }
   
