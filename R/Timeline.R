@@ -137,18 +137,25 @@ palette_twittermastodonsurvey_bars <- function(){
 }
 
 timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External survey", "RKI", "MuSPAD"))) +
-  geom_linerange(aes(y = name, 
-                     xmin = start.date,
-                     xmax = end.date,
-                     colour = source,
-                     linetype = type,
-                     linewidth = type)) +
-  scale_linewidth_manual(values = c("Data collection" = 5, "Reference period" = 2), guide = "none") +
+  geom_linerange(
+    aes(
+      y = name,
+      xmin = start.date,
+      xmax = end.date,
+      colour = source,
+      linetype = type
+    ),
+    linewidth = c(5, 2, 5, 5, 5, 5, 2)
+  ) +
   theme_minimal() +
   scale_color_manual(values = palette_twittermastodonsurvey_bars(), guide = 'none') +
   ylab("") +
   ggtitle("Data collection and infection occurrence timeline") +
-  theme(text = element_text(size = 55), plot.title = element_text(hjust = 0)) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.title.position = "plot"  # anchors title to full plot width rather than panel
+  )+
+  theme(text = element_text(size = 55)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
   theme(
