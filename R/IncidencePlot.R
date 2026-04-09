@@ -104,7 +104,12 @@ IncidencePlot <- function(bootstrapping = "no", MuSPADavail = "yes"){
     } 
     
     #Processing of RKI data
-    rkidata <- read_csv("https://raw.githubusercontent.com/robert-koch-institut/COVID-19_7-Tage-Inzidenz_in_Deutschland/main/COVID-19-Faelle_7-Tage-Inzidenz_Deutschland.csv")
+    library(httr)
+    response <- GET(
+      "https://raw.githubusercontent.com/robert-koch-institut/COVID-19_7-Tage-Inzidenz_in_Deutschland/main/COVID-19-Faelle_7-Tage-Inzidenz_Deutschland.csv",
+      config(ssl_verifypeer = FALSE, ssl_cipher_list = "DEFAULT@SECLEVEL=1")
+    )
+    rkidata <- read_csv(rawConnection(content(response, "raw")))
     if(age_group != "00+"){
       rkidata <- rkidata %>% 
         filter(Altersgruppe == age_group) %>% 
