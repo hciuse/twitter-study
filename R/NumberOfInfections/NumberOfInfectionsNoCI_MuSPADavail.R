@@ -47,25 +47,25 @@ InfectionsDataMastodon$sum <- as.double(InfectionsDataMastodon$sum)
 
 # Procession of external survey data
 ext_survey_df <- ext_survey_df %>% mutate(num_c19_infs_eng = case_when(num_c19_infs == "Nie" ~ "0",
-                                                                    num_c19_infs == "Einmal" ~ "1",
-                                                                    num_c19_infs == "Zweimal" ~ "2+",
-                                                                    num_c19_infs == "Dreimal" ~ "2+",
-                                                                    num_c19_infs == "Mehr als dreimal" ~ "2+",
-                                                                    num_c19_infs == "Ich möchte nicht antworten" ~ "I Don't Want To Answer"))                              
+                                                                       num_c19_infs == "Einmal" ~ "1",
+                                                                       num_c19_infs == "Zweimal" ~ "2+",
+                                                                       num_c19_infs == "Dreimal" ~ "2+",
+                                                                       num_c19_infs == "Mehr als dreimal" ~ "2+",
+                                                                       num_c19_infs == "Ich möchte nicht antworten" ~ "I Don't Want To Answer"))                              
 
 ext_survey_df$num_c19_infs_eng <- factor(ext_survey_df$num_c19_infs_eng, levels = c("0", "1", "2+"))
 
 # Procession of MuSPAD data
 InfectionsMuspad <- MuSPAD_df %>% select(w22_positive_test, s23_test_covid_2023)  %>% 
-                                  mutate(w22_positive_test = case_when(w22_positive_test == "Nie" ~ "0",
-                                                                    w22_positive_test == "Einmal" ~ "1",
-                                                                    w22_positive_test == "Zweimal" ~ "2+",
-                                                                    w22_positive_test == "Dreimal" ~ "2+",
-                                                                    w22_positive_test == "Mehr als dreimal" ~ "2+")) %>%
-                                  mutate(s23_positive_test = case_when((!is.na(s23_test_covid_2023) &  w22_positive_test == "0") ~ "1",
-                                  (!is.na(s23_test_covid_2023) &  w22_positive_test == "1") ~ "2+",
-                                  .default = w22_positive_test)) %>% 
-                                  count(s23_positive_test)
+  mutate(w22_positive_test = case_when(w22_positive_test == "Nie" ~ "0",
+                                       w22_positive_test == "Einmal" ~ "1",
+                                       w22_positive_test == "Zweimal" ~ "2+",
+                                       w22_positive_test == "Dreimal" ~ "2+",
+                                       w22_positive_test == "Mehr als dreimal" ~ "2+")) %>%
+  mutate(s23_positive_test = case_when((!is.na(s23_test_covid_2023) &  w22_positive_test == "0") ~ "1",
+                                       (!is.na(s23_test_covid_2023) &  w22_positive_test == "1") ~ "2+",
+                                       .default = w22_positive_test)) %>% 
+  count(s23_positive_test)
 InfectionsMuspad <- InfectionsMuspad %>% filter(!is.na(s23_positive_test))
 InfectionsDataMuspad <- data.frame(matrix(nrow = 0, ncol = 5))
 colnames(InfectionsDataMuspad) <- c("num_c19_infs_eng", "n", "percent", "Source", "sum")
@@ -76,7 +76,7 @@ InfectionsDataMuspad$num_c19_infs_eng <- factor(InfectionsDataMuspad$num_c19_inf
 InfectionsDataMuspad$n <- as.integer(InfectionsDataMuspad$n)
 InfectionsDataMuspad$percent <- as.double(InfectionsDataMuspad$percent)
 InfectionsDataMuspad$sum <- as.double(InfectionsDataMuspad$sum)
- 
+
 # Procession of COSMO data
 # Data comes from https://projekte.uni-erfurt.de/cosmo2020/files/COSMO_W70.pdf [accessed: 2025-02-12]
 InfectionsDataCOSMO <- data.frame(matrix(nrow = 0, ncol = 5))
@@ -113,9 +113,9 @@ upper_panel <- ext_survey_df %>%
   rbind(InfectionsDataCOSMO) %>%
   rbind(InfectionsDataMastodon) %>%
   mutate(Source = factor(Source, levels = c("Twitter", "Mastodon", "External Survey", "MuSPAD", "COSMO")),
-         # Create manual color columns
          bar_color = palette_twittermastodonsurvey_bars()[as.numeric(Source)],
-         errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)]) %>%
+         errorbar_color = palette_twittermastodonsurvey_errorbars()[as.numeric(Source)],
+         label = paste0(sprintf("%.1f%%", percent), " (", n, "/", as.integer(sum), ")")) %>%
   ggplot(aes(num_c19_infs_eng, percent, fill = Source)) +
   geom_bar(stat = "identity", position = position_dodge2(width = 0.85),
            fill = NA,
@@ -133,23 +133,31 @@ upper_panel <- ext_survey_df %>%
     pattern_density = 0.4,
     pattern_spacing = 0.02,
   ) +
+  geom_text(
+    aes(label = label, y = percent),
+    angle = 90,
+    hjust = -0.1,
+    size = 8
+  ) +
   theme_minimal() +
   facet_wrap(~Source, nrow = 1, labeller = labeller(Source = facet_labels)) +
   theme(panel.spacing = unit(1, "cm")) +
-  ylab("Share (Percentage)") +
+  ylab("Share (%)") +
   ggtitle("Number of Infections") +
   xlab("") +
   scale_pattern_fill_manual(values = palette_twittermastodonsurvey_bars()) +
   scale_color_identity() +
   scale_y_continuous(
-    labels = scales::label_percent(scale = 1, accuracy = 0.5),
-    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
+    labels = function(x) ifelse(x == floor(x), as.integer(x), x),
+    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100),
+    expand = expansion(mult = c(0, 0.4))
   ) +
+  scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(
     text = element_text(size = 50),
     legend.position = "none",
     legend.title = element_blank(),
-    legend.background = element_rect("white"),
+    legend.background = element_rect(fill = "white", color = NA),
     axis.ticks.x = element_line(size = 0.9),
     axis.ticks.y = element_line(size = 1),
     axis.ticks.length = unit(20, "pt"),
@@ -158,10 +166,16 @@ upper_panel <- ext_survey_df %>%
     panel.background = element_rect(fill = "white")
   )
 
-ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5))
-
-ggsave("./plots/NoInfections_Comparison_NoCI.pdf", dpi = 500, w = 24, h = 18)
-ggsave("./plots/NoInfections_Comparison_NoCI.png", dpi = 500, w = 24, h = 18)
+ggsave(
+  here("plots", "NoInfections_Comparison_NoCI.pdf"),
+  ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5)),
+  dpi = 500, w = 24, h = 22, bg = "white"
+)
+ggsave(
+  here("plots", "NoInfections_Comparison_NoCI.png"),
+  ggarrange(upper_panel, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot, nrow = 3, labels = c("A", "", "B"), font.label = list(size = 37), heights = c(1,0.01,0.5)),
+  dpi = 500, w = 24, h = 22, bg = "white"
+)
 
 # Number of infections (by recruiter) ----------------------------------------------------
 
@@ -219,20 +233,21 @@ InfectionsDataTwitter$sum <- as.double(InfectionsDataTwitter$sum)
 no_ci_plot <- InfectionsDataTwitter %>% 
   mutate(
     recruiter = factor(recruiter, levels = c("Recruiter 1 (Twitter)", "Recruiter 2", "Recruiter 3", "Recruiter 4", "Recruiter 5", "Recruiter 1 (Mastodon)")),
-    bar_color = palette_recruiters_bars()[as.numeric(recruiter)]
+    bar_color = palette_recruiters_bars()[as.numeric(recruiter)],
+    label = paste0(sprintf("%.1f%%", percent), " (", as.integer(n), "/", as.integer(sum), ")")
   ) %>%
   group_by(recruiter) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(
     stat = "identity",
-    position = position_dodge2(width = 0.8, preserve = "single"),
+    position = position_dodge(width = 0.99),
     fill = NA,
     aes(color = bar_color, group = recruiter),
     linewidth = 0.5
   ) +
   geom_bar_pattern(
     stat = "identity",
-    position = position_dodge2(width = 0.8, preserve = "single"),
+    position = position_dodge(width = 0.99),
     fill = NA,
     color = NA,
     aes(pattern_fill = recruiter, group = recruiter),
@@ -245,13 +260,20 @@ no_ci_plot <- InfectionsDataTwitter %>%
   
   scale_pattern_fill_manual(values = palette_recruiters_bars()) +
   scale_color_identity() +
-  
+  geom_text(
+    aes(label = label, y = percent, group = recruiter),
+    position = position_dodge(width = 0.99),
+    angle = 90,
+    hjust = -0.1,
+    size = 7
+  ) +
   theme_minimal() +
-  ylab("Share (Percentage)") +
-  xlab("Number of Infections (Raw)") +
-  scale_y_continuous(labels = scales::label_percent(scale = 1, accuracy = 0.5), breaks = c(0,12.5,25, 37.5, 50,75,100)) +
+  ylab("Share (%)") +
+  xlab("Number of infections (raw)") +
+  scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
+  scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
@@ -259,13 +281,25 @@ no_ci_plot <- InfectionsDataTwitter %>%
         panel.background = element_rect(fill = "white")) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.pdf", dpi = 500, w = 10, h = 7.5)
-ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI.png", dpi = 500,  w = 10, h = 7.5)
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.pdf"), dpi = 500, w = 12, h = 10, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_NoCI.png"), dpi = 500, w = 12, h = 10, bg = "white")
 
 if (!exists("glm_plot")) {
-  source(here("R", "NumberOfInfections", "NumberOfInfectionsGLM_MuSPADavail.R"))
+  cache_path <- here("data", "glm_plot_cache.rds")
+  if (file.exists(cache_path)) {
+    glm_plot <- readRDS(cache_path)
+  } else {
+    source(here("R", "NumberOfInfections", "NumberOfInfectionsGLM_MuSPADavail.R"))
+  }
 }
 
-ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom")
-ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI_GLM.pdf", dpi = 500, w = 20, h = 7.5)
-ggsave("./plots/NoInfections_Comparison_Recruiter_NoCI_GLM.png", dpi = 500,  w = 20, h = 7.5)
+ggsave(
+  here("plots", "NoInfections_Comparison_Recruiter_NoCI_GLM.pdf"),
+  ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom"),
+  dpi = 500, w = 20, h = 10, bg = "white"
+)
+ggsave(
+  here("plots", "NoInfections_Comparison_Recruiter_NoCI_GLM.png"),
+  ggarrange(no_ci_plot, glm_plot, labels = c("A", "B"), common.legend = TRUE, legend = "bottom"),
+  dpi = 500, w = 20, h = 10, bg = "white"
+)

@@ -16,7 +16,7 @@ source(here("R", "MuSPADPreprocessing.R"))
 
 # Procession of external survey data
 vaccinationData <- ext_survey_df %>% select(year_of_birth, c19_vaccination_status, c19_vaccination_details_vaccine_dose_1, c19_vaccination_details_vaccine_dose_2, c19_vaccination_details_vaccine_dose_3, c19_vaccination_details_vaccine_dose_4)
-vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 60 ~ "60+",
+vaccinationData <- vaccinationData %>%  mutate(agegroup = case_when(2023-year_of_birth >= 60 ~ "≥60",
                                                                     2023-year_of_birth >= 40 ~ "40-59",
                                                                     2023-year_of_birth >= 18 ~ "18-39"
 )) %>%
@@ -60,23 +60,23 @@ vaccinationData$dose_4_received<- factor(vaccinationData$dose_4_received, levels
 
 vaccinationData <- vaccinationData %>% group_by(agegroup) %>% pivot_longer(cols=c(dose_1_received, dose_2_received, dose_3_received, dose_4_received)) %>%
   filter(value %in% c("Yes", "Not Vaccinated")) %>% 
-  mutate(Source = "External Survey") %>%
+  mutate(Source = "External survey") %>%
   mutate(name = case_when(name == "dose_1_received" ~ "Received at\nleast 1 dose",
                           name == "dose_2_received" ~ "Received at\nleast 2 doses",
                           name == "dose_3_received" ~ "Received at\nleast 3 doses",
-                          name == "dose_4_received" ~ "Received at\nleast 4 doses")) %>% count(name) %>% mutate(Source = "External Survey") 
+                          name == "dose_4_received" ~ "Received at\nleast 4 doses")) %>% count(name) %>% mutate(Source = "External survey") 
 NotVacc <- data.frame(matrix(nrow = 0, ncol = 4))
 colnames(NotVacc) <- c("name", "n", "Source", "agegroup")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External Survey", "18-39")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 8, "External Survey", "40-59")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External Survey", "60+")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External survey", "18-39")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 8, "External survey", "40-59")
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 1, "External survey", "≥60")
 NotVacc$n <- as.double(NotVacc$n)                                                              
 
 vaccinationData <- rbind(vaccinationData, NotVacc)
 vaccinationData <- vaccinationData %>% filter(!is.na(agegroup)) %>% 
   mutate(groupsize = case_when(agegroup == "18-39" ~ 105+1,
                                agegroup == "40-59" ~ 351+8,
-                               agegroup == "60+"  ~ 88+1+2)) %>%
+                               agegroup == "≥60"  ~ 88+1+2)) %>%
   group_by(agegroup, name) %>% mutate(percent = n/groupsize) %>% select(n, name, percent, Source, agegroup, groupsize)
 
 # Procession of RKI data
@@ -89,11 +89,11 @@ RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_18b
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_18bis59_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_18bis59_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
 RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_18bis59_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "18-59", 84669326*(0.188-0.169+0.245+0.268))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received 0 doses", 100-Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_60plus_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_60plus_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
-RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_60plus_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "60+", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received 0 doses", 100-Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 1 dose", Rki$Impfquote_60plus_min1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 2 doses", Rki$Impfquote_60plus_gi,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 3 doses", Rki$Impfquote_60plus_boost1,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
+RkiVacc[nrow(RkiVacc) + 1, ] <- c("Received at\nleast 4 doses", Rki$Impfquote_60plus_boost2,"RKI\n(data acquisition:\n2020/12/27-2023/09/11)", "≥60", 84669326*(0.226+0.072))
 RkiVacc$percent <- as.double(RkiVacc$percent)
 RkiVacc$percent <- RkiVacc$percent/100
 RkiVacc$groupsize <- as.double(RkiVacc$groupsize)
@@ -113,7 +113,7 @@ MuSPADVacc <- MuSPADVacc %>% mutate(s23_vacc_type_1 = case_when(s23_vacc_type_1 
   mutate(s23_vacc_type_4 = case_when(s23_vacc_type_4 %in% c("Moderna", "BioNTech", "AstraZeneca", "Janssen/ Johnson & Johnson", "Novavax") ~ "Yes",
                                      s23_vacc_type_4 == NA ~ NA,
                                      s23_vacc_type_4 == "keine (weitere) Impfung erhalten" ~ "No")) %>%
-  mutate(agegroup = case_when(2023-s22_birth_date_yyyy >= 80 ~ "80-99",
+  mutate(agegroup = case_when(2023-s22_birth_date_yyyy >= 80 ~ "≥80",
                               2023-s22_birth_date_yyyy >= 60 ~ "60-79",
                               2023-s22_birth_date_yyyy >= 40 ~ "40-59",
                               2023-s22_birth_date_yyyy >= 18 ~ "18-39"
@@ -134,7 +134,7 @@ colnames(NotVacc) <- c("name", "n", "Source", "agegroup")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 30, "MuSPAD", "18-39")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 80, "MuSPAD", "40-59")
 NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 68 , "MuSPAD", "60-79")
-NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD", "80-99") ##Use c19_vaccination_status to find unvaccinated
+NotVacc[nrow(NotVacc) + 1, ] <- c("Received 0 doses", 6 , "MuSPAD", "≥80") ##Use c19_vaccination_status to find unvaccinated
 NotVacc$n <- as.double(NotVacc$n)                                                              
 
 MuSPADVacc <- rbind(MuSPADVacc, NotVacc)
@@ -143,7 +143,7 @@ MuSPADVacc <- MuSPADVacc %>%
   mutate(groupsize = case_when(agegroup == "18-39" ~ 639 + 30,
                                agegroup == "40-59" ~ 1403 + 80,
                                agegroup == "60-79" ~ 1678 + 68,
-                               agegroup == "80-99" ~ 133+6)) %>%
+                               agegroup == "≥80" ~ 133+6)) %>%
   group_by(agegroup, name) %>%
   mutate(percent = n/groupsize)
 MuSPADVacc$percent <- as.double(MuSPADVacc$percent)
@@ -156,6 +156,7 @@ palette_survey_bars <- function() {
 palette_survey_errorbars <- function() {
   c("#9900CC", "#730099", "#400155")
 }
+
 survey_doses <- ggplot(
   vaccinationData %>%
     filter(name != "Received 0 doses") %>%
@@ -170,9 +171,10 @@ survey_doses <- ggplot(
     mutate(uci = uci / groupsize) %>%
     mutate(uci = case_when(uci > 1 ~ 1, .default = uci)) %>%
     mutate(
-      agegroup = factor(agegroup),  # Ensure it's a factor
-      bar_color = palette_survey_bars()[as.numeric(agegroup)], 
-      errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)]
+      agegroup = factor(agegroup, levels = c("18-39", "40-59", "≥60")),
+      bar_color = palette_survey_bars()[as.numeric(agegroup)],
+      errorbar_color = palette_survey_errorbars()[as.numeric(agegroup)],
+      label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "/", as.integer(groupsize), ")")
     ),
   aes(x = name, y = percent)
 ) +
@@ -183,7 +185,6 @@ survey_doses <- ggplot(
     aes(color = bar_color, group = agegroup),
     linewidth = 1
   ) +
-  
   geom_bar_pattern(
     stat = "identity",
     position = position_dodge2(width = 0.9, preserve = "single"),
@@ -209,7 +210,13 @@ survey_doses <- ggplot(
     size = 2,
     show.legend = FALSE
   ) +
-  
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   scale_pattern_fill_manual(values = palette_survey_bars()) +
   scale_color_identity() +
   
@@ -218,13 +225,13 @@ survey_doses <- ggplot(
   theme(
     legend.position = "bottom",
     legend.title = element_blank(),
-    legend.background = element_rect("white")
+    legend.background = element_rect(fill = "white", color = NA)
   ) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("External Survey (N = 554)") +
+  ylab("Share (%)") +
+  ggtitle("External survey (N=554)") +
   theme(text = element_text(size = 50)) +
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), expand = expansion(mult = c(0, 0.15))) +
   theme(
     axis.ticks.x = element_line(),
     axis.ticks.y = element_line(),
@@ -251,10 +258,11 @@ rki_doses <- ggplot(RkiVacc %>%
                       mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
                       mutate(uci = uci/groupsize) %>%
                       mutate(
-                        agegroup = factor(agegroup),
+                        agegroup = factor(agegroup, levels = c("18-59", "≥60")),
                         bar_color = palette_rki_bars()[as.numeric(agegroup)],
-                        errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)]
-                      ), 
+                        errorbar_color = palette_rki_errorbars()[as.numeric(agegroup)],
+                        label = sprintf("%.1f%%", percent * 100)
+                      ),
                     aes(x = name,  y = percent)) +
   geom_bar(
     stat = "identity",
@@ -288,17 +296,24 @@ rki_doses <- ggplot(RkiVacc %>%
     size = 2,
     show.legend = FALSE
   ) +
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   
   scale_pattern_fill_manual(values = palette_rki_bars()) +
   scale_color_identity() +
   
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("RKI (Population)") + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+  ylab("Share (%)") +
+  ggtitle("RKI (population)") + 
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), limits = c(0,1)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
@@ -322,10 +337,11 @@ muspad_doses <- ggplot(MuSPADVacc %>%
                          mutate(uci = groupsize*(n/groupsize + 1.96*(((n/groupsize*(1-n/groupsize))/groupsize)^0.5))) %>%
                          mutate(uci = uci/groupsize) %>%
                          mutate(
-                           agegroup = factor(agegroup),
+                           agegroup = factor(agegroup, levels = c("18-39", "40-59", "60-79", "≥80")),
                            bar_color = palette_muspad_bars()[as.numeric(agegroup)],
-                           errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)]
-                         ), 
+                           errorbar_color = palette_muspad_errorbars()[as.numeric(agegroup)],
+                           label = paste0(sprintf("%.1f%%", percent * 100), "\n(", as.integer(n), "\n/", as.integer(groupsize), ")")
+                         ),
                        aes(x = name,  y = percent)) +
   geom_bar(
     stat = "identity",
@@ -359,26 +375,38 @@ muspad_doses <- ggplot(MuSPADVacc %>%
     size = 2,
     show.legend = FALSE
   ) +
-  
+  geom_text(
+    aes(label = label, y = uci, group = agegroup),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    size = 8,
+    lineheight = 0.9
+  ) +
   scale_pattern_fill_manual(values = palette_muspad_bars()) +
   scale_color_identity() +
-  
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   xlab("") +
-  ylab("Share (Percentage)") +
-  ggtitle("MuSPAD study (N = 4037)") + 
-  scale_y_continuous(labels = scales::percent) +
+  ylab("Share (%)") +
+  ggtitle("MuSPAD (N=4037)") +
+  scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), expand = expansion(mult = c(0, 0.3))) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(10, "pt")) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill = "white"))
+
 # Layout and save plots
-ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1))
+ggsave(
+  here("plots", "NoVaccinations_Comparison_No8099.pdf"),
+  ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
+  dpi = 500, w = 28, h = 36, bg = "white"
+)
 
-ggsave(here("plots", "NoVaccinations_Comparison_No8099.pdf"), dpi = 500, w = 24, h = 36)
-
-ggsave(here("plots", "NoVaccinations_Comparison_No8099.png"), dpi = 500, w = 24, h = 36)
+ggsave(
+  here("plots", "NoVaccinations_Comparison_No8099.png"),
+  ggarrange(survey_doses, ggparagraph(text="   ", face = "italic", size = 14, color = "black"), muspad_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), rki_doses,  ggparagraph(text="   ", face = "italic", size = 14, color = "black"), timelineplot2, ncol = 1,  nrow = 7, labels=c("A", "", "", "", "", "", "B"), font.label = list(size = 37), heights=c(1,0.05,1,0.05,1, 0.05,0.5), widths=c(1, 1, 1, 1, 1,1,1)),
+  dpi = 500, w = 28, h = 36, bg = "white"
+)

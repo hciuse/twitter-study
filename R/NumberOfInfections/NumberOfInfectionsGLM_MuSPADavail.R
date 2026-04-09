@@ -134,7 +134,8 @@ glm_plot <- plot_data %>%
       )
     ),
     bar_color = palette_recruiters_bars()[as.numeric(recruiter)],
-    errorbar_color = palette_recruiters_errorbars()[as.numeric(recruiter)]
+    errorbar_color = palette_recruiters_errorbars()[as.numeric(recruiter)],
+    label = sprintf("%.1f%%", percent)
   ) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(
@@ -170,17 +171,26 @@ glm_plot <- plot_data %>%
     size = 1,
     show.legend = FALSE
   ) +
+  geom_text(
+    aes(label = label, y = uci, group = recruiter),
+    position = position_dodge(width = 0.99),
+    angle = 90,
+    hjust = -0.1,
+    size = 7
+  ) +
   
   scale_pattern_fill_manual(values = palette_recruiters_bars()) +
   scale_color_identity() +
   
   theme_minimal() +
-  ylab("Share (Percentage)") +
-  xlab("Number of Infections (Estimated)") +
+  ylab("Share (%)") +
+  xlab("Number of infections (estimated)") +
   scale_y_continuous(
-    labels = scales::label_percent(scale = 1, accuracy = 0.5),
-    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100)
+    labels = function(x) ifelse(x == floor(x), as.integer(x), x),
+    breaks = c(0, 12.5, 25, 37.5, 50, 75, 100),
+    expand = expansion(mult = c(0, 0.4))
   ) +
+  scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
   theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
   theme(
@@ -192,8 +202,10 @@ glm_plot <- plot_data %>%
   ) +
   guides(fill = guide_legend(nrow = 3, byrow = TRUE))
 
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 10, h = 7.5)
-ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 10, h = 7.5)
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.pdf"), dpi = 500, w = 12, h = 10, bg = "white")
+ggsave(here("plots", "NoInfections_Comparison_Recruiter_MixedModel.png"), dpi = 500, w = 12, h = 10, bg = "white")
+
+saveRDS(glm_plot, here("data", "glm_plot_cache.rds"))
 
 # Print model summaries
 cat("\n=== Model Summary for '0 infections' ===\n")
