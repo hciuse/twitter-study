@@ -225,7 +225,7 @@ survey_doses <- ggplot(
   theme(
     legend.position = "bottom",
     legend.title = element_blank(),
-    legend.background = element_rect("white")
+    legend.background = element_rect(fill = "white", color = NA)
   ) +
   xlab("") +
   ylab("Share (%)") +
@@ -309,7 +309,7 @@ rki_doses <- ggplot(RkiVacc %>%
   
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   xlab("") +
   ylab("Share (%)") +
   ggtitle("RKI (population)") + 
@@ -386,10 +386,10 @@ muspad_doses <- ggplot(MuSPADVacc %>%
   scale_color_identity() +
   theme_minimal() +
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   xlab("") +
   ylab("Share (%)") +
-  ggtitle("MuSPAD study (N=4037)") +
+  ggtitle("MuSPAD (N=4037)") +
   scale_y_continuous(labels = scales::label_percent(suffix = ""), breaks = c(0, 0.25, 0.5, 0.75, 1), expand = expansion(mult = c(0, 0.3))) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
