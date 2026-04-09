@@ -119,7 +119,7 @@ GenderPlot <- GenderData %>% count(gender) %>% mutate(percent = 100 * n / sum(n)
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   scale_x_discrete(labels = c("female" = "Female", "male" = "Male", "diverse" = "Diverse")) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
@@ -236,7 +236,7 @@ AgePlot <- AgeData %>% filter(!is.na(age_bracket)) %>% count(age_bracket) %>%
   xlab("Age bracket") +
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
@@ -393,7 +393,7 @@ HouseholdPlot <- HouseholdData %>% filter(name != "Children < 14 in household") 
   xlab("Household size [number of members]") +
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
@@ -509,7 +509,7 @@ ChildrenPlot <- Children %>% filter(!is.na(total_hsld_size_persons_under_14)) %>
   scale_color_identity() +
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
@@ -636,7 +636,7 @@ EducationPlot <- educationLevel %>% filter(!is.na(highest_educational_qualificat
   scale_color_identity() +
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
@@ -782,7 +782,7 @@ OccupationPlot <- currentOccupation %>% filter(!is.na(current_occupation)) %>%
   scale_color_identity() +
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,25, 50,75,100), expand = expansion(mult = c(0, 0.7))) +
   theme(text = element_text(size = 50)) +
-  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "none", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt")) +
