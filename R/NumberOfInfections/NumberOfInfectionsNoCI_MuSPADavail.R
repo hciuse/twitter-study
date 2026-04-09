@@ -157,7 +157,7 @@ upper_panel <- ext_survey_df %>%
     text = element_text(size = 50),
     legend.position = "none",
     legend.title = element_blank(),
-    legend.background = element_rect("white"),
+    legend.background = element_rect(fill = "white", color = NA),
     axis.ticks.x = element_line(size = 0.9),
     axis.ticks.y = element_line(size = 1),
     axis.ticks.length = unit(20, "pt"),
@@ -273,7 +273,7 @@ no_ci_plot <- InfectionsDataTwitter %>%
   scale_y_continuous(labels = function(x) ifelse(x == floor(x), as.integer(x), x), breaks = c(0,12.5,25, 37.5, 50,75,100), expand = expansion(mult = c(0, 0.4))) +
   scale_x_discrete(labels = c("2+" = "\u22652")) +
   theme(text = element_text(size = 33)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect(fill = "white", color = NA)) +
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
         axis.ticks.length = unit(5, "pt"),
