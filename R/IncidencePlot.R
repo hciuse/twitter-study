@@ -2,6 +2,7 @@ library(tidyverse)
 library(MMWRweek)
 library(here)
 library(ggpubr)
+library(httr)
 
 # Author: S. Paltra, contact: paltra@tu-berlin.de
 
