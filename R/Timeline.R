@@ -60,7 +60,7 @@ timelineplot <- ggplot(dfr %>% filter(source != "RKI")) +
   ylab("") +
   ggtitle("Data collection and infection occurrence timeline") +
   theme(text = element_text(size = 48)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white", color = NA)) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
   theme(
     axis.ticks.x = element_line(),
@@ -121,7 +121,7 @@ timelineplotnoMuSPAD <- ggplot(dfr_noMuSPAD %>% filter(source != "RKI")) +
   ylab("") +
   ggtitle("Data collection and infection occurrence timeline") +
   theme(text = element_text(size = 48)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white", color = NA)) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2)))+
   theme(axis.ticks.x = element_line(),
         axis.ticks.y = element_line(),
@@ -156,7 +156,7 @@ timelineplot2 <- ggplot(dfr %>% filter(source %in% c("External survey", "RKI", "
     plot.title.position = "plot"  # anchors title to full plot width rather than panel
   )+
   theme(text = element_text(size = 55)) +
-  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white")) +
+  theme(legend.position = "bottom", legend.title = element_blank(), legend.background = element_rect("white", color = NA)) +
   guides(linetype = guide_legend(override.aes = list(linewidth = 2))) +
   theme(
     axis.ticks.x = element_line(),
