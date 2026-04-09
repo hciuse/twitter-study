@@ -252,7 +252,7 @@ InfectionsDataTwitter %>% group_by(recruiter) %>%
   ) %>%
   ggplot(aes(num_c19_infs_eng, percent)) +
   geom_bar(aes(fill = recruiter), stat = "identity", position = position_dodge2(width = 0.9, padding = 0.05)) +
-  geom_errorbar(aes(x = num_c19_infs_eng, ymin = lci, ymax = uci, colour = recruiter), position = position_dodge(width = 0.9), width = 0.3, alpha = 0.9, size = 1.3) +
+  geom_errorbar(aes(x = num_c19_infs_eng, ymin = lci, ymax = uci, colour = recruiter), position = position_dodge(width = 0.9), width = 0.3, alpha = 0.9, linewidth = 1.3) +
   geom_text(
     aes(label = label, y = uci, group = recruiter),
     position = position_dodge(width = 0.9),
